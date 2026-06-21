@@ -5,6 +5,7 @@ Gate verdict: fits - <which criteria you relied on: independent chunks / flow / 
 Script artifact: `.claude/workflows/<kebab-name>.js`
 
 > Fill in the angle brackets. Remove the example comments before delivering the plan.
+> Before writing to `PLAN.md`: if it already exists in the project root (check with Glob), do not overwrite it silently - ask the user or write `PLAN.<task>.md` instead (an existing plan is unrecoverable once overwritten).
 
 ## Branch map
 
@@ -42,6 +43,7 @@ Primitive: sequential (input - the previous phase's results)
 - Expensive/important branches: a separate verify stage (a skeptic agent checks the result).
 - Cheap ones: the check is built into the prompt ("after X, run test Y").
 - The whole result: post-verify below.
+- Language check: the plan, branch roles, and the agent prompts are in the language of the task (not English by default).
 
 ## Post-verify (after the run)
 - <how to check the workflow's final result as a whole>

@@ -31,8 +31,8 @@ They compose: if roles already exist in `.claude/agents`, the script can referen
 3a. **Not a fit** -> using `templates/linear-plan.md`, write a linear `PLAN.md` to the project root. Show it. Stop.
 3b. **A fit** ->
    - Read `reference/plan-to-script.md`. Using `templates/workflow-plan.md`, write an atomic plan: branches, roles (a bundle of atoms), parallel/sequential by dependencies, verify, data passed into prompts.
-   - **Show the plan and wait for approval** (checkpoint - before generating the script).
-   - After approval, read `reference/workflow-primitives.md` and generate the JS script using `templates/workflow-script.js`.
+   - **Show the plan and wait for approval** (checkpoint - before generating the script). STOP here: do not call Write for the `.js` script until the user approves the plan in words.
+   - After approval, read `reference/workflow-primitives.md` and generate the JS script using `templates/workflow-script.js`. Then run the self-check checklist at the end of that template before treating the script as ready-to-run.
    - Place the artifacts in the project (see below).
    - **Do not run the script.** Offer to run it as a separate step (an explicit user opt-in; the run itself is done by the Workflow tool, not this skill).
 
@@ -54,7 +54,7 @@ Load on demand, not all at once.
 
 ## Artifacts - strictly into the current project (CWD)
 
-- Linear or workflow plan: `PLAN.md` in the current project root.
+- Linear or workflow plan: `PLAN.md` in the current project root. **Before writing, check whether `PLAN.md` already exists (Glob). If it does, do not overwrite it silently - ask the user, or write `PLAN.<task>.md` instead. Overwriting an existing plan is an unrecoverable loss.**
 - Workflow script: `<project>/.claude/workflows/<kebab-name>.js` (file name = `meta.name`).
 - Never write artifacts to the home folder, the skill folder, or anywhere global. Only into the project being worked on.
 - If branches write to the same files in parallel, note in the plan that running it needs `isolation:'worktree'` and a git repository (check for `.git`).
@@ -62,12 +62,14 @@ Load on demand, not all at once.
 ## Checkpoints
 
 - State assumptions about the task before starting.
+- Before delivering, verify the artifact's language matches the task: plan, gate rationale, agent prompts, and the script's labels/comments are in the user's language - not English by default.
 - Show the plan **before** generating the script and wait for approval.
 - Running the workflow is a separate, explicit user step (a workflow runs in the background and autonomously to the end; control happens at phase boundaries, not inside a phase).
 
 ## What it does not do
 
 - Does not run the workflow itself (only prepares the plan + script; running is an opt-in).
+- Does not generate the script in the same turn as the plan - the plan must be approved first.
 - Does not create `.claude/agents` subagents (that is agent-constructor).
 - Does not write artifacts outside the current project.
 - Does not split trivial linear work into agents, and does not produce a workflow where a linear plan is enough (that is just overhead).

@@ -46,6 +46,8 @@ data.bugs.forEach(...)
 
 In the plan, mark each dependent branch with "input: result of branch X" - that is the hand-off point into the prompt.
 
+**Final check before generating the script: for EVERY dependent branch, is the previous branch's result actually written into the text of its prompt? An agent is blind - if the data is not in the prompt string, it will not see it.**
+
 ## verify in a workflow
 
 An atomic verify ("how to check the step") maps onto a workflow in one of three ways:
@@ -62,6 +64,13 @@ Choice: an expensive/important branch - a verify stage (an independent agent); a
 ## Write isolation
 
 If several agents write to the same files in parallel - `agent(..., {isolation:'worktree'})` (a git worktree per agent). Requires a git repository and is expensive (setup + disk). Only when they would otherwise conflict. If agents only read, or write to different files, isolation is not needed.
+
+## Partial failure and budget
+
+- **For a COLLECTION of interchangeable results, `.filter(Boolean)` after `parallel`/`pipeline`, then check enough survived.** Some branches return nothing. Filter out the empties, then verify the count is enough to assemble from. If fewer than the norm came back, degrade EXPLICITLY - tell the user the data is incomplete. Never glue `null`/`undefined` into the text of the next task.
+- **For a few NAMED, distinct branches that are all required, do NOT filter - guard each by name.** Filtering collapses positions and would mislabel a survivor (B printed as "Input A"). Destructure `const [a, b] = await parallel([...])` (positions are preserved; a failed branch is `null` in its slot) and guard: `if (!a || !b) { log(...); return null }`.
+- **Check `budget.remaining()` before a big batch.** Before spawning a large run, compare the cost against what is left. If it will not fit - cut into batches or stop with a clear message. Do not fail in the middle of the run.
+- **Resume and re-verify.** The script saves and continues itself, so a break is recoverable. After any interruption, re-check the final result for completeness before trusting it.
 
 ## Parallelization anti-patterns
 

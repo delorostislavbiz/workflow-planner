@@ -33,7 +33,8 @@ return x   // returned as the final result
 - `opts.phase` - explicit phase assignment (important inside parallel/pipeline, to avoid racing the global phase() state)
 - `opts.schema` - JSON Schema for structured output
 - `opts.agentType` - a custom subagent from `.claude/agents` (works only if it is actually defined there)
-- `opts.model` - override the model (by default do NOT set it - it inherits the main-loop model)
+- `opts.model` - override the model. By default do NOT set it - the agent inherits the main-loop model, which is usually right. **Exception - an explicit user rule wins:** if the user's CLAUDE.md requires always naming the model for subagents / `agent()` calls, follow it and set `opts.model` explicitly (`opus` for hard tasks, `sonnet` for simple/mechanical ones). With no such rule, omit it when unsure which tier fits; under such a rule, do not omit - default to `opus` for anything non-trivial.
+- `opts.effort` - reasoning-effort level of the subagent (`low` | `medium` | `high` | `xhigh` | `max`); omit to inherit the session effort. Use `low` for cheap mechanical stages, higher tiers only for the hardest verify/judge stages.
 - `opts.isolation: 'worktree'` - its own git worktree (expensive; only when agents write to files in parallel and would otherwise conflict; requires a git repository)
 
 **`parallel(thunks[])`** - a BARRIER: launches all thunks at once and waits until ALL finish. Array elements are functions `() => agent(...)` (so they start under parallel's control, not immediately). A failed thunk yields `null` in the result (the call itself does not throw) - filter with `.filter(Boolean)`. Use when the next step needs ALL results at once.
@@ -59,8 +60,9 @@ Rule: pipeline by default; a parallel barrier only when the result of ALL agents
 
 ## Limits and runtime constraints
 
-- Concurrent: `min(16, cores - 2)` agents. Excess queue up and run as slots free (you can submit any number to parallel/pipeline).
-- Total per run: up to 1000 agents (a runaway-loop backstop).
+- Concurrent: `min(16, cores - 2)` agents. Excess queue up and run as slots free (you may pass more items than the concurrency cap - they just queue).
+- A single `parallel`/`pipeline` call accepts at most **4096 items** per call; passing more is an explicit error, not a silent truncation. For larger sets, split into batches.
+- Total per run: up to 1000 agents across the whole workflow (a runaway-loop backstop).
 - The script is plain JS, NOT TypeScript (type annotations, interfaces, generics do not parse).
 - Unavailable: `Date.now()`, `Math.random()`, `new Date()` with no arguments (they break resume) - pass time via `args`, get variety via index/label. No filesystem or Node API access from inside the script.
 - Every `agent()` starts with a CLEAN isolated context: it sees neither the conversation nor other agents. Everything it needs goes into the prompt.
