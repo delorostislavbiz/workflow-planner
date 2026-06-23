@@ -63,7 +63,7 @@ Load on demand, not all at once.
 
 - State assumptions about the task before starting.
 - Before delivering, verify the artifact's language matches the task: plan, gate rationale, agent prompts, and the script's labels/comments are in the user's language - not English by default.
-- Show the plan **before** generating the script and wait for approval.
+- (Workflow branch only) Show the plan **before** generating the script and wait for approval. A linear plan has no script: write `PLAN.md`, show it, and stop - there is no approval-wait for linear.
 - Running the workflow is a separate, explicit user step (a workflow runs in the background and autonomously to the end; control happens at phase boundaries, not inside a phase).
 
 ## What it does not do

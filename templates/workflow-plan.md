@@ -7,6 +7,12 @@ Script artifact: `.claude/workflows/<kebab-name>.js`
 > Fill in the angle brackets. Remove the example comments before delivering the plan.
 > Before writing to `PLAN.md`: if it already exists in the project root (check with Glob), do not overwrite it silently - ask the user or write `PLAN.<task>.md` instead (an existing plan is unrecoverable once overwritten).
 
+## Assumptions
+- <what is taken as given about the task - environment, inputs, scope>
+- <assumption 2>
+
+State assumptions before the plan (in the language of the task). If any is wrong, the plan changes - confirm the doubtful ones with the user first.
+
 ## Branch map
 
 | Branch | Role | Depends on | Parallel with | Input (data into the prompt) | Output |
