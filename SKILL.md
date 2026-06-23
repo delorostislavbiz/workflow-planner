@@ -35,7 +35,7 @@ They compose: if roles already exist in `.claude/agents`, the script can referen
    - After approval, read `reference/workflow-primitives.md` and generate the JS script using `templates/workflow-script.js`. Then run the self-check checklist at the end of that template before treating the script as ready-to-run.
    - Place the artifacts in the project (see below).
    - **Do not run the script.** Offer to run it as a separate step (an explicit user opt-in; the run itself is done by the Workflow tool, not this skill).
-   - **(Optional, on request) Diagram.** If the user asks for a visualization (or accepts a one-line offer), generate a self-contained HTML diagram of the workflow per `reference/diagram-html.md`. It is a view of the plan - it must match the branch map. Workflow plans only; not produced unless asked.
+   - **(Optional, on request) Diagram.** If the user asks for a visualization (or accepts a one-line offer), generate a self-contained HTML diagram of the workflow per `reference/diagram-html.md`, in **plain client-facing language** (the audience is a non-technical client and the tired author): everyday words, a one-line explanation under each block, a legend - no internal jargon on screen. It is a view of the plan - it must match the branch map. Workflow plans only; not produced unless asked.
 
 ## Atomicity
 
