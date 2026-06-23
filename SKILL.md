@@ -24,6 +24,8 @@ Don't mix them up:
 
 They compose: if roles already exist in `.claude/agents`, the script can reference them via `opts.agentType`. But by default a workflow uses the default subagent + prompt.
 
+**Depth belongs to agent-constructor, not here.** Nested subagents (a worker that spawns its own sub-workers, up to 5 levels - Claude Code v2.1.172) are NOT available inside a Workflow: workflow agents are leaves and do not receive the Agent tool (verified - see `reference/workflow-primitives.md`, "Depth and nesting"). If a task needs that depth, route it to the Agent-tool / `.claude/agents` path (agent-constructor) and note it in the plan - do not try to express it as a Workflow branch.
+
 ## How it works
 
 1. **Understand the task.** Take the description. State assumptions up front. If the wording is ambiguous (especially short / dictated input), ask rather than guess.

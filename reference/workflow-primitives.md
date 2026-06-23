@@ -32,7 +32,7 @@ return x   // returned as the final result
 - `opts.label` - label in the progress view
 - `opts.phase` - explicit phase assignment (important inside parallel/pipeline, to avoid racing the global phase() state)
 - `opts.schema` - JSON Schema for structured output
-- `opts.agentType` - a custom subagent from `.claude/agents` (works only if it is actually defined there)
+- `opts.agentType` - a custom subagent from `.claude/agents`. Works only if the role is **registered at the start of the session** - the Workflow runtime does not hot-reload a role file added mid-session; an unknown name errors with "agent type ... not found".
 - `opts.model` - override the model. By default do NOT set it - the agent inherits the main-loop model, which is usually right. **Exception - an explicit user rule wins:** if the user's CLAUDE.md requires always naming the model for subagents / `agent()` calls, follow it and set `opts.model` explicitly (`opus` for hard tasks, `sonnet` for simple/mechanical ones). With no such rule, omit it when unsure which tier fits; under such a rule, do not omit - default to `opus` for anything non-trivial.
 - `opts.effort` - reasoning-effort level of the subagent (`low` | `medium` | `high` | `xhigh` | `max`); omit to inherit the session effort. Use `low` for cheap mechanical stages, higher tiers only for the hardest verify/judge stages.
 - `opts.isolation: 'worktree'` - its own git worktree (expensive; only when agents write to files in parallel and would otherwise conflict; requires a git repository)
@@ -66,6 +66,16 @@ Rule: pipeline by default; a parallel barrier only when the result of ALL agents
 - The script is plain JS, NOT TypeScript (type annotations, interfaces, generics do not parse).
 - Unavailable: `Date.now()`, `Math.random()`, `new Date()` with no arguments (they break resume) - pass time via `args`, get variety via index/label. No filesystem or Node API access from inside the script.
 - Every `agent()` starts with a CLEAN isolated context: it sees neither the conversation nor other agents. Everything it needs goes into the prompt.
+
+## Depth and nesting (workflow agents are leaves)
+
+A workflow-spawned agent does NOT receive the Agent tool - it cannot spawn its own subagents. Verified empirically on 2026-06-24 (three probe runs: the default workflow agent, and even `agentType: 'general-purpose'` with full tools, all reported the Agent tool unavailable - they see only `TaskCreate`, a session task tracker). This is not in the official docs; treat it as a tested fact, not a guess.
+
+Consequence:
+- **Inside a workflow, depth/scale comes only from the script primitives** - `parallel` (width), `pipeline` (flow), `workflow()` (nested orchestration, one level). A branch cannot fan out into sub-workers by itself.
+- **True nested subagents** (a subagent spawning subagents, up to **5 levels** deep - Claude Code v2.1.172) live in the **regular Agent tool + `.claude/agents`** path, OUTSIDE the Workflow tool (the agent-constructor domain). The depth limit is a fixed 5; each level is an isolated context, so tokens grow with depth. Prefer width (a flat fan-out) and reach for depth only when a sub-task is itself a large decomposition that needs its own isolated fan-out. (Agent-tool nesting is documented but has reported flakiness - GitHub issue #19077.)
+
+So: if a task needs a worker that itself splits into sub-workers, that is NOT a Workflow branch - route it to the Agent-tool / `.claude/agents` path.
 
 ## Fabrications (these do NOT exist - do not use)
 
