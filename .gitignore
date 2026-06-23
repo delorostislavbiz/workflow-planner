@@ -1,6 +1,9 @@
 # Внутренние заметки сессий Claude Code — не публиковать
 .claude/
 
+# Служебные снимки Playwright MCP (браузерные проверки) — не в репозиторий
+.playwright-mcp/
+
 # Системный мусор
 Thumbs.db
 .DS_Store
