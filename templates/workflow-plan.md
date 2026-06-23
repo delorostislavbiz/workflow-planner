@@ -47,6 +47,7 @@ Primitive: sequential (input - the previous phase's results)
 
 ## verify strategy
 - Expensive/important branches: a separate verify stage (a skeptic agent checks the result).
+- Independence: prefer a check the generator did not make itself - a deterministic gate (test/linter/type-check) first, else a SEPARATE skeptic agent, not the same agent grading its own output.
 - Cheap ones: the check is built into the prompt ("after X, run test Y").
 - The whole result: post-verify below.
 - Language check: the plan, branch roles, and the agent prompts are in the language of the task (not English by default).

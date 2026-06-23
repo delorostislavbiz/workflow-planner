@@ -61,6 +61,8 @@ An atomic verify ("how to check the step") maps onto a workflow in one of three 
 
 Choice: an expensive/important branch - a verify stage (an independent agent); a cheap one - a built-in check; the final assembly - a post-check.
 
+**Independence of the check.** Prefer a check the generator did not produce itself. A deterministic gate first - a test, linter, type-check or compile that passes or fails on its own. If the judgment needs a model, use a SEPARATE skeptic agent with a clean context, not the same agent grading its own output. A self-report on the same context is the workflow version of testing on the data you trained on: it confirms what the agent already believes, not whether the result is real.
+
 ## Write isolation
 
 If several agents write to the same files in parallel - `agent(..., {isolation:'worktree'})` (a git worktree per agent). Requires a git repository and is expensive (setup + disk). Only when they would otherwise conflict. If agents only read, or write to different files, isolation is not needed.
@@ -71,6 +73,16 @@ If several agents write to the same files in parallel - `agent(..., {isolation:'
 - **For a few NAMED, distinct branches that are all required, do NOT filter - guard each by name.** Filtering collapses positions and would mislabel a survivor (B printed as "Input A"). Destructure `const [a, b] = await parallel([...])` (positions are preserved; a failed branch is `null` in its slot) and guard: `if (!a || !b) { log(...); return null }`.
 - **Check `budget.remaining()` before a big batch.** Before spawning a large run, compare the cost against what is left. If it will not fit - cut into batches or stop with a clear message. Do not fail in the middle of the run.
 - **Resume and re-verify.** The script saves and continues itself, so a break is recoverable. After any interruption, re-check the final result for completeness before trusting it.
+
+## Loops with a stop condition
+
+If a branch repeats until a goal is met (loop-until-dry, loop-until-budget, retry-until-pass), the loop MUST have an explicit way to stop - never an open `while (true)`:
+
+- **Iteration cap.** A hard upper bound (a `for` up to N, or a counter), so a stuck loop ends instead of running to the 1000-agent backstop.
+- **No-progress break.** Stop after K rounds that add nothing new - track what was already seen and compare, do not just count. Picking the "best of many" tries is choosing noise unless the bar rises with the number of attempts.
+- **Budget guard.** `while (budget.total && budget.remaining() > COST) {...}` so the loop cannot run the account dry; guard on `budget.total` or with no target `remaining()` is `Infinity` and the loop never ends.
+
+State the stop condition in the plan next to the looping branch, not only in the script.
 
 ## Parallelization anti-patterns
 

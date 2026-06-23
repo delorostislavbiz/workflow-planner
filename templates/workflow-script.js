@@ -72,3 +72,5 @@ return c
 // 3. No Date.now(), Math.random() or new Date() without an argument anywhere.
 // 4. For every dependent branch, the data from previous branches is written INTO the prompt TEXT.
 // 5. parallel (barrier, waits for ALL) vs pipeline (flow, the DEFAULT) is a deliberate choice.
+// 6. If the script loops (until-dry / until-budget / retry), it has an EXPLICIT stop:
+//    iteration cap + no-progress break + budget guard - never an open while(true).
