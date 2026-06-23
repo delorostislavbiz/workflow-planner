@@ -57,3 +57,6 @@ Primitive: sequential (input - the previous phase's results)
 
 ## Running
 A workflow runs in the background and requires an explicit opt-in. After the plan is approved, the script `.claude/workflows/<kebab-name>.js` is generated. If branches write to the same files in parallel, `isolation:'worktree'` and a git repository are needed.
+
+## Diagram (optional, on request)
+A self-contained HTML view of this workflow - phases, parallel branches, and loops with their stop conditions - can be generated on request as `PLAN.diagram.html` (see `reference/diagram-html.md`). Not produced unless asked.

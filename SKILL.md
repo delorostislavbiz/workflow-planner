@@ -35,6 +35,7 @@ They compose: if roles already exist in `.claude/agents`, the script can referen
    - After approval, read `reference/workflow-primitives.md` and generate the JS script using `templates/workflow-script.js`. Then run the self-check checklist at the end of that template before treating the script as ready-to-run.
    - Place the artifacts in the project (see below).
    - **Do not run the script.** Offer to run it as a separate step (an explicit user opt-in; the run itself is done by the Workflow tool, not this skill).
+   - **(Optional, on request) Diagram.** If the user asks for a visualization (or accepts a one-line offer), generate a self-contained HTML diagram of the workflow per `reference/diagram-html.md`. It is a view of the plan - it must match the branch map. Workflow plans only; not produced unless asked.
 
 ## Atomicity
 
@@ -48,6 +49,7 @@ Every step (linear) or atom (workflow) is **one meaningful action with its own v
 | Writing a workflow plan | `templates/workflow-plan.md` |
 | Translating a plan into a script | `reference/plan-to-script.md` + `reference/workflow-primitives.md` + `templates/workflow-script.js` |
 | Writing a linear plan | `templates/linear-plan.md` |
+| Drawing the workflow diagram (on request) | `reference/diagram-html.md` |
 | Need a worked example | `examples.md` |
 
 Load on demand, not all at once.
@@ -56,6 +58,7 @@ Load on demand, not all at once.
 
 - Linear or workflow plan: `PLAN.md` in the current project root. **Before writing, check whether `PLAN.md` already exists (Glob). If it does, do not overwrite it silently - ask the user, or write `PLAN.<task>.md` instead. Overwriting an existing plan is an unrecoverable loss.**
 - Workflow script: `<project>/.claude/workflows/<kebab-name>.js` (file name = `meta.name`).
+- Workflow diagram (optional, on request, workflow plans only): `PLAN.diagram.html` next to `PLAN.md` (or `PLAN.<task>.diagram.html`). Self-contained HTML - see `reference/diagram-html.md`.
 - Never write artifacts to the home folder, the skill folder, or anywhere global. Only into the project being worked on.
 - If branches write to the same files in parallel, note in the plan that running it needs `isolation:'worktree'` and a git repository (check for `.git`).
 
@@ -74,3 +77,4 @@ Load on demand, not all at once.
 - Does not write artifacts outside the current project.
 - Does not split trivial linear work into agents, and does not produce a workflow where a linear plan is enough (that is just overhead).
 - Does not use non-existent primitives or options (see the "Fabrications" section in `reference/workflow-primitives.md`).
+- Does not auto-insert the HTML diagram: it is produced only on request, for workflow plans only.
