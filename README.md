@@ -1,5 +1,7 @@
 # workflow-planner
 
+**🇬🇧 English** · [🇩🇪 Deutsch](README.de.md)
+
 A Claude Code skill that turns a task into the right atomic plan. It first decides whether the task needs parallel orchestration (a Dynamic Workflow via the Workflow tool) or a plain linear plan, and writes the matching artifact.
 
 ## Why
@@ -36,6 +38,8 @@ Or just describe a task - the skill activates from the description. Then:
    - `.claude/workflows/<name>.js` (in workflow mode).
 4. Running the workflow is a separate step and your explicit choice. The skill never runs anything itself.
 
+Note: artifacts (the plan, diagram, agent prompts) come out in the **language of your task** - write the task in German and the plan is in German. The skill's own instructions are in English; that is what the model reads and it does not affect the output.
+
 ## Boundary with other skills
 
 - **agent-constructor** builds reusable subagent roles (`.claude/agents/*.md`) and coordination via a README. workflow-planner is about one-off orchestration of a concrete task and about plans. They compose: if roles already exist, the script can reference them via `opts.agentType`.
@@ -48,13 +52,15 @@ workflow-planner/
 |-- reference/
 |   |-- applicability.md          # "fits / does not fit" criteria
 |   |-- workflow-primitives.md    # Workflow tool primitives, limits, common mistakes
-|   `-- plan-to-script.md         # how to turn a plan into a JS script
+|   |-- plan-to-script.md         # how to turn a plan into a JS script
+|   `-- diagram-html.md           # optional client-facing HTML diagram of a workflow
 |-- templates/
 |   |-- workflow-plan.md          # workflow plan template
 |   |-- workflow-script.js        # JS script template
 |   `-- linear-plan.md            # linear plan template
 |-- examples.md                   # two worked examples
-|-- README.md
+|-- README.md                     # English
+|-- README.de.md                  # German / Deutsch
 `-- LICENSE
 ```
 
