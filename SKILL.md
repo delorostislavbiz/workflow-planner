@@ -1,6 +1,6 @@
 ---
 name: workflow-planner
-description: Plans a task and produces an atomic plan. A hybrid gate first decides whether the task fits Dynamic Workflows: if not, it writes a linear PLAN.md (step -> verify); if yes, it writes a plan with branches, roles and parallelism plus a ready-to-run JS script for the Workflow tool. Use when asked to "plan a task", "atomic plan", "workflow plan", "parallelize this task", "do we need a workflow here", "break this into parallel branches". Does NOT create subagents in .claude/agents (that is agent-constructor) - this skill is about one-off orchestration via the Workflow tool (parallel/pipeline) and about plans.
+description: 'Plans a task and produces an atomic plan. A hybrid gate first decides whether the task fits Dynamic Workflows: if not, it writes a linear PLAN.md (step -> verify); if yes, it writes a plan with branches, roles and parallelism plus a ready-to-run JS script for the Workflow tool. Use when asked to "plan a task", "atomic plan", "workflow plan", "parallelize this task", "do we need a workflow here", "break this into parallel branches". Does NOT create subagents in .claude/agents (that is agent-constructor) - this skill is about one-off orchestration via the Workflow tool (parallel/pipeline) and about plans.'
 license: MIT
 user-invocable: true
 argument-hint: [task description]
