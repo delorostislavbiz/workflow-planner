@@ -1,0 +1,20 @@
+{
+  "name": "workflow-planner",
+  "interface": {
+    "displayName": "Workflow Planner"
+  },
+  "plugins": [
+    {
+      "name": "workflow-planner-codex",
+      "source": {
+        "source": "local",
+        "path": "./plugins/workflow-planner-codex"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

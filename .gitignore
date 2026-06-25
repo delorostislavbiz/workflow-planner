@@ -4,6 +4,9 @@
 # Служебные снимки Playwright MCP (браузерные проверки) — не в репозиторий
 .playwright-mcp/
 
+# Служебные логи Codex hooks/workflow runs — не в репозиторий
+.codex/workflow-runs/
+
 # Системный мусор
 Thumbs.db
 .DS_Store

@@ -1,0 +1,34 @@
+{
+  "name": "workflow-planner-codex",
+  "version": "0.1.0",
+  "description": "Codex version of workflow-planner: decides whether a task needs a linear plan or a flat multi-agent workflow plan.",
+  "author": {
+    "name": "workflow-planner"
+  },
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "workflow",
+    "planning",
+    "subagents",
+    "multi-agent"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Workflow Planner for Codex",
+    "shortDescription": "Plan linear work or flat Codex subagent workflows.",
+    "longDescription": "Adapts the workflow-planner gate and atomic planning discipline for Codex. It produces linear plans when parallelism is not justified and Codex multi-agent workflow plans when flat subagent orchestration is useful.",
+    "developerName": "workflow-planner",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Subagents"
+    ],
+    "defaultPrompt": [
+      "$workflow-planner plan this task",
+      "$workflow-planner decide whether this needs subagents",
+      "$workflow-planner create an atomic Codex workflow plan"
+    ],
+    "brandColor": "#2563EB"
+  }
+}
