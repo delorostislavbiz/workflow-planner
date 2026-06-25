@@ -7,6 +7,11 @@
 # Служебные логи Codex hooks/workflow runs — не в репозиторий
 .codex/workflow-runs/
 
+# Тестовые прогоны скила — НИКОГДА не публиковать (артефакты только в полигоне)
+skill-comparison-test/
+*-test/
+test-*/
+
 # Системный мусор
 Thumbs.db
 .DS_Store
