@@ -1,6 +1,6 @@
 ---
 name: workflow-planner
-description: 'Plans a task and produces an atomic plan. A hybrid gate first decides whether the task fits Dynamic Workflows: if not, it writes a linear PLAN.md (step -> verify); if yes, it writes a plan with branches, roles and parallelism plus a ready-to-run JS script for the Workflow tool. Use when asked to "plan a task", "atomic plan", "workflow plan", "parallelize this task", "do we need a workflow here", "break this into parallel branches". Does NOT create subagents in .claude/agents (that is agent-constructor) - this skill is about one-off orchestration via the Workflow tool (parallel/pipeline) and about plans.'
+description: 'Plans a task and produces an atomic plan. A hybrid gate first decides whether the task fits Dynamic Workflows: if not, it writes a linear PLAN.md (step -> verify); if yes, it writes a plan with branches, roles and parallelism plus a ready-to-run JS script for the Workflow tool. Use when asked to "plan a task", "atomic plan", "workflow plan", "parallelize this task", "do we need a workflow here", "break this into parallel branches". Does NOT create subagents in .claude/agents (that is agent-constructor) - this skill is about one-off orchestration via the Workflow tool (parallel/pipeline) and about plans. It also includes a Prompt Helper that turns a fuzzy idea or a rough draft into a correct workflow prompt; triggers "help me write a workflow prompt", "I have an idea for a workflow", "do I need a workflow", "check my workflow prompt".'
 license: MIT
 user-invocable: true
 argument-hint: [task description]
@@ -15,6 +15,19 @@ Turns a task into the right atomic plan. First decides whether the task needs a 
 - **A fit** -> a plan with branches/roles/parallelism + a ready-to-run JS script for the Workflow tool.
 
 Write generated artifacts in the language of the task (match the user's language; do not force English or any other language onto the plan).
+
+## Entry routing - Prompt Helper vs planner
+
+Before the gate, route by what the user brings. An explicit user command always beats auto-detection.
+
+| Input | Route |
+|------|-------|
+| A task already shaped as a workflow prompt | the planner flow below (gate -> plan -> script) |
+| A direct imperative ("make N docs/pages/things"), not yet shaped as a workflow prompt | the **Prompt Helper** build-path (gate first) |
+| An idea / "help me write a workflow prompt" / "do I need a workflow?" | the **Prompt Helper** build-path |
+| "Check my draft" / a near-ready prompt pasted | the **Prompt Helper** draft-audit |
+
+The **Prompt Helper** turns a fuzzy idea or a rough draft into a correct workflow prompt (newcomer-first): it leads with the gate, runs a recipe or an interview, assembles the prompt, and offers an opt-in inline hole-check. It never runs the target workflow. A near-ready prompt goes to draft-audit, not a full rebuild. Details: `reference/prompt-helper.md`; recipes: `reference/prompt-patterns.md`.
 
 ## Boundary with agent-constructor
 
@@ -47,6 +60,8 @@ Every step (linear) or atom (workflow) is **one meaningful action with its own v
 
 | When | Read |
 |------|------|
+| Helping the user write the prompt (idea or draft) | `reference/prompt-helper.md` |
+| Matching a task to a workflow recipe | `reference/prompt-patterns.md` |
 | Deciding applicability | `reference/applicability.md` |
 | Writing a workflow plan | `templates/workflow-plan.md` |
 | Translating a plan into a script | `reference/plan-to-script.md` + `reference/workflow-primitives.md` + `templates/workflow-script.js` |

@@ -30,7 +30,19 @@ And the work is **decomposable** into agents with clean context: each chunk is s
 
 Mentally remove parallelism and flow. If nothing is lost (the work is still linear) - a linear plan. If there is real parallelism OR a multi-stage flow at volume - a workflow.
 
+## Decision matrix (signals)
+
+A quick complement to the two sections above (it does not replace them). A workflow is not only about parallelism: a need for independent expertise or verification can justify one too. And many chunks do NOT justify one if they all write into a single mutable target.
+
+- **Fit:** independent units; a need for independent expertise or adversarial review; verifiable artifacts; a shared synthesis over the results; a high cost of a silent error.
+- **No-fit:** 1-2 steps; a shared mutable file without isolation; the goal is unclear; no verifiable result; cheaper to do linearly.
+- **Caution (a workflow may still fit, but flag it in the plan):** needs access/secrets; destructive changes; a high-stakes domain (legal / medical / financial); the task list is dynamic; strong step-by-step dependence on a human.
+
 ## Borderline case: multiple artifacts with a shared source of truth
+
+### Shared-source threshold rule
+
+Single normative statement (other sections and files reference this anchor; they do not restate it): when **3+** same-type chunks cite a shared, not-yet-fixed source of truth, do not run them blind - use a workflow with a **phase-0 anchor** (Phase 0 fixes the source; Phase 1 runs `parallel` with that source in every prompt). With only **2** chunks, go linear (fix the source, then write both). 4 chunks is "3+", so it routes to the anchor workflow, never to a linear plan.
 
 A task of the form "make several things" (documentation sections, pages, chapters, configs) where the chunks look independent. Do not rush into parallel - first check whether they cite a shared source.
 
