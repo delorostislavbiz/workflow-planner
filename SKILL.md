@@ -16,6 +16,15 @@ Turns a task into the right atomic plan. First decides whether the task needs a 
 
 Write generated artifacts in the language of the task (match the user's language; do not force English or any other language onto the plan).
 
+## How the skill talks to the user
+
+These rules govern every reply to the user (written in the user's language), at every stage - gate, plan, Prompt Helper, checkpoints:
+
+1. **Plain language, always.** Simple, everyday words. No jargon. If a technical term is unavoidable, unpack it in one short phrase. Short sentences. Point first, detail after.
+2. **Always show the logic - briefly.** Say *why* you do each thing, clearly but short. If the user struggles, explain in more detail; the baseline stays plain and simple.
+3. **One step at a time.** Lead the user stage by stage. Explain the next step before doing it. One reply = one explanation + one action - do not stack several decisions into a single message.
+4. **Don't pick the solution for the user, and don't hand them a menu.** A pointed hint or one recommended next step is fine; ending a reply with "we can do A, B or C - which?" is not. A focused question to fill a missing fact (the gate's 1-2 clarifying questions) is still allowed - that gathers input, it does not outsource the decision.
+
 ## Entry routing - Prompt Helper vs planner
 
 Before the gate, route by what the user brings. An explicit user command always beats auto-detection.
