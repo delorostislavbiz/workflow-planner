@@ -42,6 +42,7 @@ They compose: if roles already exist in `.claude/agents`, the script can referen
 ## How it works
 
 1. **Understand the task.** Take the description. State assumptions up front. If the wording is ambiguous (especially short / dictated input), ask rather than guess.
+1.5. **Build the Acceptance Contract (judge).** Before routing or planning, establish what "done" means for the whole task. Read `reference/acceptance-contract.md` and build an Acceptance Contract: observable predicates, fixed before the work starts, including an independent out-of-sample check. Honor the delegation slider - if the user gives criteria, structure and drill them; if the user is tired or says "decide yourself", auto-draft and then get ratification. Trivial tasks: a one-line contract is enough - do not run a full interview. The contract is **frozen at plan approval** - changing it later is a new round with explicit re-ratification, not a silent edit. The contract feeds the rest of the plan: per-step verifies and the whole-task post-verify check **against** this contract, not ad hoc.
 2. **Applicability gate (hybrid).** Read `reference/applicability.md`. Run the task through the criteria. If obvious, give a verdict with a one-line rationale. If borderline, ask 1-2 clarifying questions via AskUserQuestion.
 3a. **Not a fit** -> using `templates/linear-plan.md`, write a linear `PLAN.md` to the project root. Show it. Stop.
 3b. **A fit** ->
@@ -62,6 +63,7 @@ Every step (linear) or atom (workflow) is **one meaningful action with its own v
 |------|------|
 | Helping the user write the prompt (idea or draft) | `reference/prompt-helper.md` |
 | Matching a task to a workflow recipe | `reference/prompt-patterns.md` |
+| Building the Acceptance Contract (definition of done, before the gate) | `reference/acceptance-contract.md` |
 | Deciding applicability | `reference/applicability.md` |
 | Writing a workflow plan | `templates/workflow-plan.md` |
 | Translating a plan into a script | `reference/plan-to-script.md` + `reference/workflow-primitives.md` + `templates/workflow-script.js` |

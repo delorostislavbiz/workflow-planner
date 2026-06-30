@@ -13,6 +13,18 @@ Script artifact: `.claude/workflows/<kebab-name>.js`
 
 State assumptions before the plan (in the language of the task). If any is wrong, the plan changes - confirm the doubtful ones with the user first.
 
+## Acceptance Contract
+- **Goal (one measurable line):** <what + threshold>
+- **Done when (observable predicates):**
+  - [ ] <checkable predicate>
+  - [ ] <checkable predicate>
+- **Hard constraints:** <budget / must-haves / deadline>
+- **Durability:** <how we confirm it holds, not a one-off>
+- **Independent check (out-of-sample):** <who/what, not involved in building>
+- **Stop condition:** <met when… ; raise the bar as attempts grow>
+
+What "done" means, fixed before the branches and frozen at plan approval. For trivial tasks this may be a single `Done when:` line. The Post-verify section below checks the final result against this contract.
+
 ## Branch map
 
 | Branch | Role | Depends on | Parallel with | Input (data into the prompt) | Output |
@@ -48,12 +60,15 @@ Primitive: sequential (input - the previous phase's results)
 ## verify strategy
 - Expensive/important branches: a separate verify stage (a skeptic agent checks the result).
 - Independence: prefer a check the generator did not make itself - a deterministic gate (test/linter/type-check) first, else a SEPARATE skeptic agent, not the same agent grading its own output.
+- Contract as rubric: pass the Acceptance Contract text into the separate skeptic agent's prompt as its rubric, so verify checks the task-level contract, not just the atom's output.
 - Cheap ones: the check is built into the prompt ("after X, run test Y").
 - The whole result: post-verify below.
 - Language check: the plan, branch roles, and the agent prompts are in the language of the task (not English by default).
 
 ## Post-verify (after the run)
-- <how to check the workflow's final result as a whole>
+- Check the final result against every predicate in the Acceptance Contract.
+- Run the contract's **independent check** here - a verify the generating agents did not make themselves (a separate skeptic agent for expensive/important goals).
+- Pass only if all predicates hold AND the independent check confirms them.
 
 ## Running
 A workflow runs in the background and requires an explicit opt-in. After the plan is approved, the script `.claude/workflows/<kebab-name>.js` is generated. If branches write to the same files in parallel, `isolation:'worktree'` and a git repository are needed.

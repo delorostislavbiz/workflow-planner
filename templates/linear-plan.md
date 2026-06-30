@@ -12,13 +12,26 @@ Gate verdict: not a fit for a workflow - <why: linear chain / shared state / int
 
 State assumptions before the steps (in the language of the task). If any is wrong, the plan changes - confirm the doubtful ones with the user first.
 
+## Acceptance Contract
+- **Goal (one measurable line):** <what + threshold>
+- **Done when (observable predicates):**
+  - [ ] <checkable predicate>
+  - [ ] <checkable predicate>
+- **Hard constraints:** <budget / must-haves / deadline>
+- **Durability:** <how we confirm it holds, not a one-off>
+- **Independent check (out-of-sample):** <who/what, not involved in building>
+- **Stop condition:** <met when… ; raise the bar as attempts grow>
+
+What "done" means, fixed before the steps and frozen at plan approval. For trivial tasks this may be a single `Done when:` line. The final step below verifies against this contract.
+
 ## Steps (atomic, each with a check)
 
 1. <atomic step> -> verify: <concrete command / test / visual check>
 2. <step> -> verify: <...>
 3. <step> -> verify: <...>
+N (final). Verify the whole task against the Acceptance Contract above -> verify: every "Done when" predicate checked and the independent check performed.
 
-Each step is one meaningful action. Verify is a concrete way to confirm the step is done (not "check manually" but exactly what to run / see).
+Each step is one meaningful action. Verify is a concrete way to confirm the step is done (not "check manually" but exactly what to run / see). The final step closes by checking the Acceptance Contract, not an ad-hoc "looks done".
 
 ## Plan self-review
 - Language: are the plan and its steps written in the language of the task (not English by default)?
