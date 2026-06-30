@@ -1,6 +1,6 @@
 ---
 name: workflow-planner
-description: Decide whether a task needs a linear plan or a Codex multi-agent workflow plan. Use when asked to plan a task, make an atomic plan, parallelize work, decide whether subagents are justified, break work into branches, or create a workflow plan for Codex. This Codex version does not generate Claude Dynamic Workflow JS scripts; it prepares a flat Codex subagent workflow plan and runs it only after explicit user approval.
+description: Decide whether a task needs a linear plan or a Codex multi-agent workflow plan. Use when asked to plan a task, make an atomic plan, parallelize work, decide whether subagents are justified, break work into branches, or create a workflow plan for Codex. This Codex version does not generate Claude Dynamic Workflow JS scripts; it prepares a flat Codex subagent workflow plan and runs it only after explicit user approval. It also includes a Prompt Helper that turns a fuzzy idea or a rough draft into a correct workflow prompt; triggers "help me write a workflow prompt", "I have an idea for a workflow", "do I need a workflow", "check my workflow prompt".
 ---
 
 # Workflow Planner for Codex
@@ -9,6 +9,8 @@ Turn a task into the right atomic plan for Codex.
 
 - **Not a fit for subagents** -> write a linear `PLAN.md` in "step -> verify" format.
 - **A fit for subagents** -> write a flat Codex multi-agent workflow plan with phases, branches, roles, prompts, handoffs, and verification gates.
+
+The **Prompt Helper** turns a fuzzy idea or a rough draft into a correct workflow prompt (newcomer-first): it leads with the gate, runs a recipe or an interview, assembles the prompt, and offers an opt-in inline hole-check. It never runs the target workflow. A near-ready prompt goes to draft-audit, not a full rebuild. Details: `reference/prompt-helper.md`; recipes: `reference/prompt-patterns.md`.
 
 Write generated artifacts in the language of the user's task. Do not force English.
 
@@ -31,9 +33,20 @@ This is the Codex adaptation of the Claude workflow-planner skill. Keep the dist
 
 The multi-agent discipline from the local `multiagent-workflow` plugin is built into this skill: start from facts, choose linear work when parallelism is not justified, keep delegation bounded, accept artifacts instead of summaries, and verify before synthesis. Users should not need to install a separate multiagent plugin for this skill to be useful.
 
+## Entry routing - Prompt Helper vs planner
+
+Before the gate, route by what the user brings. An explicit user command always beats auto-detection.
+
+| Input | Route |
+|------|-------|
+| A task already shaped as a workflow prompt | the planner flow below (gate -> plan) |
+| A direct imperative ("make N docs/pages/things"), not yet shaped as a workflow prompt | the **Prompt Helper** build-path (gate first) |
+| An idea / "help me write a workflow prompt" / "do I need a workflow?" | the **Prompt Helper** build-path |
+| "Check my draft" / a near-ready prompt pasted | the **Prompt Helper** draft-audit |
+
 ## How It Works
 
-0. **Is the task ready to plan?** First check what the user brought. A raw idea or a vague "do this" -> shape it into a concrete task with a couple of clarifying questions before planning. An already-shaped task -> go straight to step 1. (This Codex version has no Prompt Helper / prompt builder; shaping happens through questions, not a generator.)
+0. **Prompt or not? (entry routing).** First decide what the user brought. A raw idea / rough draft / "help me write a prompt" / "do I need a workflow?" -> go to the **Prompt Helper** (`reference/prompt-helper.md`) first to build the workflow prompt. An already-shaped task or a ready prompt -> skip prompt-building and go straight to step 1. Building the prompt is a separate front stage, not part of planning.
 1. **Understand the task.** State assumptions up front. If the task is ambiguous and guessing would change the plan, ask a concise clarifying question.
 1.5. **Build the Acceptance Contract (judge).** Before routing or planning, establish what "done" means for the whole task. Read `reference/acceptance-contract.md` and build an Acceptance Contract: observable predicates, fixed before the work starts, including an independent out-of-sample check and a stop condition. Honor the delegation slider - if the user gives criteria, structure and drill them; if the user is tired or says "decide yourself", auto-draft and then get ratification. Trivial tasks: a one-line contract is enough - do not run a full interview. The contract is **frozen at plan approval** - changing it later is a new round with explicit re-ratification, not a silent edit. It feeds the rest of the plan: per-step verifies, the whole-task post-verify, and the rubric handed to any verifier subagent - all check **against** this contract, not ad hoc.
 2. **Applicability gate.** Read `reference/applicability.md`. Decide whether the task benefits from flat Codex subagents or should stay linear.
@@ -53,6 +66,8 @@ Every linear step or workflow atom is one meaningful action with its own verify.
 
 | When | Read |
 |------|------|
+| Helping the user write the prompt (idea or draft) | `reference/prompt-helper.md` |
+| Matching a task to a workflow recipe | `reference/prompt-patterns.md` |
 | Building the Acceptance Contract (definition of done, before the gate) | `reference/acceptance-contract.md` |
 | Deciding applicability | `reference/applicability.md` |
 | Writing a Codex workflow plan | `templates/codex-workflow-plan.md` |
@@ -84,3 +99,4 @@ Load on demand, not all at once.
 - Does not rely on recursive subagents.
 - Does not split trivial linear work into agents.
 - Does not run subagents before explicit user approval.
+- The Prompt Helper does not run the target workflow - it only builds the prompt.
