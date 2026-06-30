@@ -73,6 +73,7 @@ Every linear step or workflow atom is one meaningful action with its own verify.
 | Writing a Codex workflow plan | `templates/codex-workflow-plan.md` |
 | Mapping a plan to subagents | `reference/plan-to-codex-workflow.md` + `reference/codex-workflow-runtime.md` |
 | Writing a linear plan | `templates/linear-plan.md` |
+| Need a worked Prompt Helper example | `examples.md` |
 
 Load on demand, not all at once.
 
