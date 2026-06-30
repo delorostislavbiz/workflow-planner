@@ -25,6 +25,7 @@ The multi-agent discipline from the local `multiagent-workflow` plugin is built 
 ## How It Works
 
 1. **Understand the task.** State assumptions up front. If the task is ambiguous and guessing would change the plan, ask a concise clarifying question.
+1.5. **Build the Acceptance Contract (judge).** Before routing or planning, establish what "done" means for the whole task. Read `reference/acceptance-contract.md` and build an Acceptance Contract: observable predicates, fixed before the work starts, including an independent out-of-sample check and a stop condition. Honor the delegation slider - if the user gives criteria, structure and drill them; if the user is tired or says "decide yourself", auto-draft and then get ratification. Trivial tasks: a one-line contract is enough - do not run a full interview. The contract is **frozen at plan approval** - changing it later is a new round with explicit re-ratification, not a silent edit. It feeds the rest of the plan: per-step verifies, the whole-task post-verify, and the rubric handed to any verifier subagent - all check **against** this contract, not ad hoc.
 2. **Applicability gate.** Read `reference/applicability.md`. Decide whether the task benefits from flat Codex subagents or should stay linear.
 3. **Linear path.** If not a fit, use `templates/linear-plan.md` and write `PLAN.md` in the project root. Show it and stop.
 4. **Workflow path.**
@@ -42,6 +43,7 @@ Every linear step or workflow atom is one meaningful action with its own verify.
 
 | When | Read |
 |------|------|
+| Building the Acceptance Contract (definition of done, before the gate) | `reference/acceptance-contract.md` |
 | Deciding applicability | `reference/applicability.md` |
 | Writing a Codex workflow plan | `templates/codex-workflow-plan.md` |
 | Mapping a plan to subagents | `reference/plan-to-codex-workflow.md` + `reference/codex-workflow-runtime.md` |

@@ -12,6 +12,18 @@ Runtime: flat Codex subagents orchestrated by the main agent; no Claude Workflow
 - <what is taken as given about the task - environment, inputs, scope>
 - <assumption 2>
 
+## Acceptance Contract
+- **Goal (one measurable line):** <what + threshold>
+- **Done when (observable predicates):**
+  - [ ] <checkable predicate>
+  - [ ] <checkable predicate>
+- **Hard constraints:** <budget / must-haves / deadline>
+- **Durability:** <how we confirm it holds, not a one-off>
+- **Independent check (out-of-sample):** <who/what, not involved in building>
+- **Stop condition:** <met when… ; raise the bar as attempts grow>
+
+What "done" means, fixed before the branches and frozen at plan approval. For trivial tasks this may be a single `Done when:` line. The Verify Strategy below checks the final result against this contract.
+
 ## Branch Map
 
 | Branch | Role | Depends on | Parallel with | Input passed into prompt | Output |
@@ -87,7 +99,8 @@ Stop when: <stop condition>
 
 - Deterministic checks: <tests/linters/build/source checks>
 - Independent checks: <separate verifier branch or main-thread review>
-- Final post-verify: <whole-result check>
+- Contract as rubric: paste the Acceptance Contract text into the verifier subagent's prompt as its rubric, so verify checks the task-level contract, not just a branch's output.
+- Final post-verify: check the final result against every predicate in the Acceptance Contract, and run the contract's independent (out-of-sample) check here - a verify the generating agents did not make themselves. Pass only if all predicates hold AND the independent check confirms them.
 - Language check: plan, branch roles, and prompts match the user's language.
 
 ## Run Checkpoint
