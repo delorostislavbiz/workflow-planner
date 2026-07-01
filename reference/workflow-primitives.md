@@ -32,7 +32,7 @@ return x   // returned as the final result
 - `opts.label` - label in the progress view
 - `opts.phase` - explicit phase assignment (important inside parallel/pipeline, to avoid racing the global phase() state)
 - `opts.schema` - JSON Schema for structured output
-- `opts.agentType` - a custom subagent from `.claude/agents`. Works only if the role is **registered at the start of the session** - the Workflow runtime does not hot-reload a role file added mid-session; an unknown name errors with "agent type ... not found".
+- `opts.agentType` - a custom subagent from `.claude/agents`. The role registry refreshes **between turns**, not instantly: a role file added mid-session is invisible in the same turn (the call errors with "agent type ... not found") but works from the next turn on - no session restart needed (verified 2026-07-02, v2.1.198).
 - `opts.model` - override the model. By default do NOT set it - the agent inherits the main-loop model, which is usually right. **Exception - an explicit user rule wins:** if the user's CLAUDE.md requires always naming the model for subagents / `agent()` calls, follow it and set `opts.model` explicitly (`opus` for hard tasks, `sonnet` for simple/mechanical ones). With no such rule, omit it when unsure which tier fits; under such a rule, do not omit - default to `opus` for anything non-trivial.
 - `opts.effort` - reasoning-effort level of the subagent (`low` | `medium` | `high` | `xhigh` | `max`); omit to inherit the session effort. Use `low` for cheap mechanical stages, higher tiers only for the hardest verify/judge stages.
 - `opts.isolation: 'worktree'` - its own git worktree (expensive; only when agents write to files in parallel and would otherwise conflict; requires a git repository)
@@ -69,7 +69,7 @@ Rule: pipeline by default; a parallel barrier only when the result of ALL agents
 
 ## Depth and nesting (workflow agents are leaves)
 
-A workflow-spawned agent does NOT receive the Agent tool - it cannot spawn its own subagents. Verified empirically on 2026-06-24 (three probe runs: the default workflow agent, and even `agentType: 'general-purpose'` with full tools, all reported the Agent tool unavailable - they see only `TaskCreate`, a session task tracker). This is not in the official docs; treat it as a tested fact, not a guess.
+A workflow-spawned agent does NOT receive the Agent tool - it cannot spawn its own subagents. Verified empirically on 2026-06-24, re-verified 2026-07-02 on Claude Code 2.1.198 (probe runs: the default workflow agent and `agentType: 'general-purpose'` both lack Agent; a direct call errors verbatim with "No such tool available: Agent. Agent exists but is not enabled in this context", and ToolSearch finds no deferred Agent tool either). This is not in the official docs; treat it as a tested fact, not a guess.
 
 Consequence:
 - **Inside a workflow, depth/scale comes only from the script primitives** - `parallel` (width), `pipeline` (flow), `workflow()` (nested orchestration, one level). A branch cannot fan out into sub-workers by itself.
@@ -92,8 +92,8 @@ updates. Every empirical fact lives here with its verification date.
 
 | Fact | Kind | Last verified | Re-check by |
 |------|------|---------------|-------------|
-| Workflow agents are leaves: no Agent tool, cannot spawn subagents (even `agentType: 'general-purpose'`) | empirical | 2026-06-24, 3 probe runs | probe 1 below |
-| `agentType` roles must be registered at session start; no hot-reload of a role file added mid-session | empirical | not recorded - date it at the next probe | probe 2 below |
+| Workflow agents are leaves: no Agent tool, cannot spawn subagents (even `agentType: 'general-purpose'`) | empirical | 2026-07-02, Claude Code 2.1.198, 2 probe runs (error: "Agent exists but is not enabled in this context") | probe 1 below |
+| `agentType` role added mid-session: invisible in the same turn ("agent type ... not found"), works from the next turn - the registry refreshes between turns, no session restart needed | empirical | 2026-07-02, Claude Code 2.1.198, 2 probe runs (same-turn fail, next-turn pass) | probe 2 below |
 | Agent-tool nesting depth is 5, outside Workflow (v2.1.172); reported flakiness in GitHub issue #19077 | documented + issue | 2026-06 (docs) | docs / changelog |
 | Limits: min(16, cores-2) concurrent, 1000 agents per run, 4096 items per call | documented | - | docs |
 | `Date.now()` / `Math.random()` / argless `new Date()` unavailable | documented | - | docs |
@@ -110,5 +110,6 @@ boundary note in SKILL.md - do not leave the registry and the prose disagreeing.
    Attempt to call the Agent tool with a trivial subtask; report the exact error if it is
    unavailable." Repeat with `agentType: 'general-purpose'`. Expected today: no Agent tool.
 2. *Hot-reload:* add a new role file to `.claude/agents` mid-session, then run a one-agent
-   workflow with that `agentType`. Expected today: "agent type ... not found".
+   workflow with that `agentType` twice: in the same turn (expected: "agent type ... not
+   found") and again on the next turn (expected: the agent runs - the registry has refreshed).
 3. Record: date, Claude Code version, verbatim outcome - then update the table above.
