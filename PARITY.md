@@ -16,18 +16,20 @@ and flags drift (it cannot judge meaning - it catches forgotten mirrors, not bad
 | `SKILL.md` | `SKILL.md` | shared logic, runtime wording differs |
 | `reference/applicability.md` | `reference/applicability.md` | shared rules (thresholds, Decision Matrix, threshold anchor) - heading phrasing differs by design, so the checker tests existence only; verify rule parity by eye |
 | `reference/acceptance-contract.md` | `reference/acceptance-contract.md` | shared - keep identical |
-| `reference/prompt-helper.md` | `reference/prompt-helper.md` | shared logic; run-modes DIVERGE until the review-workflow port lands (Codex still says "Phase 2, not MVP" - see Pending) |
+| `reference/prompt-helper.md` | `reference/prompt-helper.md` | shared logic, run-modes wording differs per runtime |
 | `reference/prompt-patterns.md` | `reference/prompt-patterns.md` | shared recipes, Form/Feasibility reworded per runtime |
 | `reference/workflow-primitives.md` | `reference/codex-workflow-runtime.md` | intentionally different (runtimes differ) |
 | `reference/plan-to-script.md` | `reference/plan-to-codex-workflow.md` | intentionally different |
 | `reference/diagram-html.md` | — | Claude-only (by design) |
-| `templates/workflow-plan.md` | `templates/codex-workflow-plan.md` | counterparts, structure should track |
+| `reference/review-workflow.md` | `reference/review-workflow.md` | shared logic (6 lenses, consent rules); Codex ships the reviewer brief inline instead of a script |
+| `reference/after-run.md` | `reference/after-run.md` | shared logic; Codex has no resume cache - its copy says so and re-runs branches surgically instead |
+| `templates/workflow-plan.md` | `templates/codex-workflow-plan.md` | counterparts, structure should track (both carry Scale & Budget) |
 | `templates/linear-plan.md` | `templates/linear-plan.md` | shared rules (self-review items, quality bar, assumptions note); verdict phrasing and tool names differ per runtime |
 | `templates/workflow-script.js` | — | Claude-only (Codex has no JS runtime) |
-| `templates/review-prompt.js` | — | Claude-only |
-| `examples.md` | `examples.md` | shared idea; artifacts differ per runtime |
+| `templates/review-prompt.js` | — | Claude-only (the Codex reviewer brief lives inside its `reference/review-workflow.md`) |
+| `examples.md` | `examples.md` | shared idea; artifacts differ per runtime (scripts vs plan shapes) |
 | `tests/prompt-helper/*` | `tests/prompt-helper/*` | shared |
-| `tests/gate/*` | — | pending (see below) |
+| `tests/gate/*` | `tests/gate/*` | shared logic; script/validator claims reworded per runtime (G9 tests the Run Protocol instead) |
 | `tools/validate-workflow.js` | — | Claude-only (validates the JS runtime) |
 | `tools/run-fixtures.js` | usable for Codex via `--cmd "codex exec"` | shared tool |
 | `tools/check-parity.js` | n/a | the checker itself |
@@ -44,20 +46,10 @@ and flags drift (it cannot judge meaning - it catches forgotten mirrors, not bad
 
 ## Pending (consciously deferred)
 
-- **2026-07-01** `reference/review-workflow.md` + `templates/review-prompt.js` - the deep
-  prompt-review for Codex needs a codex-runtime shape (main agent + 6 flat skeptics);
-  logic is portable, packaging is not written yet. Until it lands, the Codex
-  `reference/prompt-helper.md` run-modes and mini-glossary still call the review-workflow
-  "Phase 2, not MVP" - update BOTH when porting.
-- **2026-07-01** Codex `tests/prompt-helper/runbook.md` has no "Automated runs" section;
-  the `[multi-turn]` tag is defined inline in the fixtures header instead. When the runner
-  workflow is adopted for Codex (`tools/run-fixtures.js --cmd "codex exec"`), port the
-  runbook section too.
-- **2026-07-01** `reference/after-run.md` - resume semantics are Workflow-tool-specific;
-  a Codex counterpart would cover re-running failed subagents instead.
-- **2026-07-01** `examples.md` examples 3-4 (anchor, loop-until-dry) - port with Codex
-  orchestration wording instead of JS scripts.
-- **2026-07-01** `tests/gate/fixtures.md` - G1/G9 reference the Workflow-tool flow; a Codex
-  port must reword script-related claims.
-- **2026-07-01** `templates/workflow-plan.md` "Scale & budget" section - mirror into
-  `templates/codex-workflow-plan.md` with Codex numbers (prefer 2-6 subagents, no 16-cap).
+(Empty. The 2026-07-01 batch - review-workflow, after-run, planner examples, gate fixtures,
+Scale & Budget, runbook automation section - was ported the same day. When you defer a new
+mirror, add it here with a date.)
+
+- **2026-07-01, watch item (not a mirror):** `tools/run-fixtures.js --cmd "codex exec"` is
+  untested - confirm `codex exec` reads the prompt from stdin before trusting an automated
+  Codex suite run; if it does not, the Codex suites stay manual (noted in both runbooks).

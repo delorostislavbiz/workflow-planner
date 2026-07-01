@@ -51,6 +51,26 @@ Otherwise **FAIL**, naming the missing claim or the violated forbidden action.
   explicit "yes"). See `F13`.
 - The **linear** fixture must end in STOP with no workflow prompt/plan (`F2`).
 
+## Automated runs (experimental)
+
+The shared runner in the repo root, `tools/run-fixtures.js`, also drives this suite. It
+pipes each SINGLE-TURN fixture input to a headless run via **stdin**, gives every fixture a
+fresh workspace under `--out` (inside the polygon), and with `--judge` scores the transcript
+against the fixture spec. From the repo root:
+
+```
+node tools/run-fixtures.js --suite plugins/workflow-planner-codex/skills/workflow-planner/tests/prompt-helper/fixtures.md ^
+     --cmd "codex exec" --out D:\AI-PROJECTS\WORKFLOW-PLANNER-TEST\prompt-helper-codex --judge
+```
+
+Limits:
+- The `--cmd` command must read the prompt from stdin. Verify `codex exec` does before
+  trusting a full run; if it does not, this suite stays manual.
+- Fixtures marked **[multi-turn]** (F5, F6, F7, F13) are skipped by the runner - drive them
+  by hand per the protocol above.
+- The judge is a model: treat PASS/FAIL as triage; spot-check every FAIL and one random PASS.
+- The planner suite (`tests/gate/fixtures.md`) runs the same way, `--out ...\gate-codex`.
+
 ## Where results live
 
 Save the filled transcripts + evidence under

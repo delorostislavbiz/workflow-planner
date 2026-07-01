@@ -26,11 +26,14 @@ const PAIRS = [
   ['reference/prompt-patterns.md', 'reference/prompt-patterns.md', true],
   ['reference/workflow-primitives.md', 'reference/codex-workflow-runtime.md', false],
   ['reference/plan-to-script.md', 'reference/plan-to-codex-workflow.md', false],
+  ['reference/review-workflow.md', 'reference/review-workflow.md', false],
+  ['reference/after-run.md', 'reference/after-run.md', false],
   ['templates/workflow-plan.md', 'templates/codex-workflow-plan.md', false],
   ['templates/linear-plan.md', 'templates/linear-plan.md', true],
   ['examples.md', 'examples.md', false],
   ['tests/prompt-helper/fixtures.md', 'tests/prompt-helper/fixtures.md', true],
   ['tests/prompt-helper/runbook.md', 'tests/prompt-helper/runbook.md', false],
+  ['tests/gate/fixtures.md', 'tests/gate/fixtures.md', false],
 ];
 
 // Case and punctuation are normalized: "## Plan Self-Review" == "## Plan self-review".

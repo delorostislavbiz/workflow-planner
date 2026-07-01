@@ -85,6 +85,7 @@ workflow-planner/
 
 - Claude Code with Agent Skills and Dynamic Workflows (the Workflow tool) support.
 - For `isolation:'worktree'` (when branches write to the same files in parallel) - a git repository.
+- For the `tools/` scripts (script validator, test runner, parity check) - Node.js >= 18. The skill itself works without them; you only lose the mechanical checks.
 
 ## License
 
