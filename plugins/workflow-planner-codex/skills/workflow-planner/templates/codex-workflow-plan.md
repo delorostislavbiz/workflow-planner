@@ -103,6 +103,17 @@ Stop when: <stop condition>
 - Final post-verify: check the final result against every predicate in the Acceptance Contract, and run the contract's independent (out-of-sample) check here - a verify the generating agents did not make themselves. Pass only if all predicates hold AND the independent check confirms them.
 - Language check: plan, branch roles, and prompts match the user's language.
 
+## Scale & Budget
+
+- **Subagents total:** ~<N> (<work branches> + <verifiers> + <synthesis, if a subagent>). Codex prefers **2-6 subagents**; for many same-type items, batch them into chunks rather than one subagent per item (see `reference/codex-workflow-runtime.md`) - go wider only if the user accepts the cost.
+- **If a branch loops:** worst case <subagents per round x round cap>.
+- **Cost ceiling:** <what the user agreed to>. There is no budget API - the ceiling is an agreement; the main agent tracks rounds/spawns against it and stops at the ceiling, saying so.
+- **If the ceiling is hit:** what gets cut FIRST, explicitly - <e.g. "verify only blocker findings" / "process 20 of 30 pages and say so">. Degrade by this rule, never silently.
+
+State the numbers so the user decides about the run knowing its size. Surprising the user with the cost afterwards is a planning failure.
+
 ## Run Checkpoint
 
 This plan does not run anything by itself. After the user explicitly approves running it, the main Codex agent spawns the listed flat subagents, waits for required results, verifies artifacts, and synthesizes the final output.
+
+After the run - reading the result against the contract, re-running failed branches, re-run vs re-plan, and making the plan reusable - see `reference/after-run.md`. If the task is repeatable (weekly audit, release acceptance), keep run-specific inputs in a parameters block at the top of the plan, not hardcoded in the briefs.

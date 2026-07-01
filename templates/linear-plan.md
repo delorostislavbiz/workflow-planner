@@ -39,6 +39,7 @@ Each step is one meaningful action. Verify is a concrete way to confirm the step
 - Are the dependencies between steps ordered correctly?
 - Granularity: does any step hide 3+ sub-actions or more than ~half a day of work (e.g. "migrate all products with attributes, images, variations")? If so, split it into atoms, each with its own verify.
 - Verify strength: is any verify only a count or "check manually"? A count hides systematic errors inside the items - check content on a sample, not just quantity.
+- Simplicity: no agents or orchestration where a linear plan is clearer.
 - Plan quality score >= 8/10, otherwise refine.
 
 ## TODO in code (source of truth for what is unfinished)

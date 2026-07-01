@@ -1,6 +1,6 @@
 {
   "name": "workflow-planner-codex",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Codex version of workflow-planner: decides whether a task needs a linear plan or a flat multi-agent workflow plan.",
   "author": {
     "name": "workflow-planner"

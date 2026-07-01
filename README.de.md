@@ -12,7 +12,9 @@ Nicht jede Aufgabe gehört in einen Workflow. Eine lineare Kette von Schritten g
 
 1. **Eignungs-Gate (hybrid).** Bewertet die Aufgabe anhand einer Checkliste. Ist die Antwort eindeutig, gibt er ein Urteil mit Begründung. Ist sie grenzwertig, stellt er 1–2 klärende Fragen.
 2. **Passt nicht** – schreibt einen linearen `PLAN.md` im Format „Schritt → Prüfung".
-3. **Passt** – schreibt einen atomaren Plan mit Zweigen, Rollen und Parallelität und erzeugt nach deiner Freigabe ein lauffähiges JS-Skript für das Workflow-Tool.
+3. **Passt** – schreibt einen atomaren Plan mit Zweigen, Rollen, Parallelität und einer Umfangs-/Budget-Schätzung und erzeugt nach deiner Freigabe ein lauffähiges JS-Skript für das Workflow-Tool – anschließend wird das Skript mechanisch geprüft (`tools/validate-workflow.js` fängt erfundene Primitive und Resume-Brecher ab).
+4. **Prompt-Helfer.** Verwandelt eine vage Idee oder einen groben Entwurf in einen korrekten Workflow-Prompt: zuerst das Gate, dann ein Rezept (8 Muster) oder ein Interview, dann eine optionale Lückenprüfung – inline oder als tiefe Multi-Agenten-Prüfung für riskante Prompts (separate, ausdrückliche Zustimmung).
+5. **Nach dem Lauf.** Hilft, das Ergebnis gegen den Abnahme-Vertrag zu lesen, gescheiterte Zweige per Resume fortzusetzen statt alles neu zu bezahlen, und ein Einmal-Skript über `args` wiederverwendbar zu machen.
 
 ## Installation
 
@@ -51,14 +53,29 @@ workflow-planner/
 |-- SKILL.md                      # Orchestrierung: Gate + Ablauf + Navigation
 |-- reference/
 |   |-- applicability.md          # Kriterien „passt / passt nicht"
-|   |-- workflow-primitives.md    # Workflow-Tool: Primitive, Grenzen, häufige Fehler
+|   |-- acceptance-contract.md    # was „fertig" heißt, fixiert vor der Planung
+|   |-- prompt-helper.md          # von der Idee/dem Entwurf zum korrekten Workflow-Prompt
+|   |-- prompt-patterns.md        # 8 Workflow-Rezepte
+|   |-- workflow-primitives.md    # Workflow-Tool: Primitive, Grenzen, Fakten-Register
 |   |-- plan-to-script.md         # wie aus einem Plan ein JS-Skript wird
+|   |-- review-workflow.md        # tiefe Multi-Agenten-Prüfung eines Prompts (Opt-in)
+|   |-- after-run.md              # Ergebnisse lesen, Resume, Umplanen, Wiederverwenden
 |   `-- diagram-html.md           # optionales kundenfreundliches HTML-Diagramm eines Workflows
 |-- templates/
-|   |-- workflow-plan.md          # Vorlage für den Workflow-Plan
+|   |-- workflow-plan.md          # Vorlage für den Workflow-Plan (inkl. Umfang & Budget)
 |   |-- workflow-script.js        # Vorlage für das JS-Skript
+|   |-- review-prompt.js          # fertiges Review-Workflow-Skript
 |   `-- linear-plan.md            # Vorlage für den linearen Plan
-|-- examples.md                   # zwei ausgearbeitete Beispiele
+|-- tools/
+|   |-- validate-workflow.js      # mechanischer Validator für Workflow-Skripte
+|   |-- run-fixtures.js           # Headless-Testrunner (experimentell)
+|   `-- check-parity.js           # Drift-Prüfung gegen die Codex-Kopie
+|-- tests/
+|   |-- gate/                     # Fixtures für Gate & Planer
+|   `-- prompt-helper/            # Fixtures + Runbook für den Prompt-Helfer
+|-- examples.md                   # vier ausgearbeitete Beispiele + Prompt-Helfer-Läufe
+|-- plugins/workflow-planner-codex/  # die Codex-Kopie (siehe PARITY.md)
+|-- PARITY.md                     # Paritäts-Checkliste zwischen den beiden Kopien
 |-- README.md                     # Englisch
 |-- README.de.md                  # Deutsch
 `-- LICENSE
@@ -68,6 +85,7 @@ workflow-planner/
 
 - Claude Code mit Unterstützung für Agent Skills und Dynamic Workflows (das Workflow-Tool).
 - Für `isolation:'worktree'` (wenn Zweige parallel in dieselben Dateien schreiben) – ein Git-Repository.
+- Für die Skripte in `tools/` (Skript-Validator, Testrunner, Paritätsprüfung) – Node.js ≥ 18. Der Skill selbst funktioniert auch ohne sie; es entfallen nur die mechanischen Prüfungen.
 
 ## Lizenz
 

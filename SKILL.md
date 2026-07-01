@@ -1,10 +1,10 @@
 ---
 name: workflow-planner
-description: 'Plans a task and produces an atomic plan. A hybrid gate first decides whether the task fits Dynamic Workflows: if not, it writes a linear PLAN.md (step -> verify); if yes, it writes a plan with branches, roles and parallelism plus a ready-to-run JS script for the Workflow tool. Use when asked to "plan a task", "atomic plan", "workflow plan", "parallelize this task", "do we need a workflow here", "break this into parallel branches". Does NOT create subagents in .claude/agents (that is agent-constructor) - this skill is about one-off orchestration via the Workflow tool (parallel/pipeline) and about plans. It also includes a Prompt Helper that turns a fuzzy idea or a rough draft into a correct workflow prompt; triggers "help me write a workflow prompt", "I have an idea for a workflow", "do I need a workflow", "check my workflow prompt".'
+description: 'Plans a task and produces an atomic plan. A hybrid gate first decides whether the task fits Dynamic Workflows: if not, it writes a linear PLAN.md (step -> verify); if yes, it writes a plan with branches, roles and parallelism plus a ready-to-run JS script for the Workflow tool. Use when asked to "plan a task", "atomic plan", "workflow plan", "parallelize this task", "do we need a workflow here", "break this into parallel branches". Does NOT create subagents in .claude/agents (that is agent-constructor) - this skill is about one-off orchestration via the Workflow tool (parallel/pipeline) and about plans. It also includes a Prompt Helper that turns a fuzzy idea or a rough draft into a correct workflow prompt; triggers "help me write a workflow prompt", "I have an idea for a workflow", "do I need a workflow", "check my workflow prompt". Also helps AFTER a workflow run: reading the result against the acceptance contract, recovering failed branches via resume, re-run vs re-plan, making the script reusable; triggers "the workflow failed", "the workflow was interrupted", "resume the workflow", "re-run this workflow with new inputs".'
 license: MIT
 user-invocable: true
 argument-hint: [task description]
-allowed-tools: Read, Write, Edit, Glob, Grep, AskUserQuestion
+allowed-tools: Read, Write, Edit, Glob, Grep, AskUserQuestion, Bash(node:*)
 ---
 
 # Workflow Planner
@@ -58,9 +58,10 @@ They compose: if roles already exist in `.claude/agents`, the script can referen
 3b. **A fit** ->
    - Read `reference/plan-to-script.md`. Using `templates/workflow-plan.md`, write an atomic plan: branches, roles (a bundle of atoms), parallel/sequential by dependencies, verify, data passed into prompts.
    - **Show the plan and wait for approval** (checkpoint - before generating the script). STOP here: do not call Write for the `.js` script until the user approves the plan in words.
-   - After approval, read `reference/workflow-primitives.md` and generate the JS script using `templates/workflow-script.js`. Then run the self-check checklist at the end of that template before treating the script as ready-to-run.
+   - After approval, read `reference/workflow-primitives.md` and generate the JS script using `templates/workflow-script.js`. Then run the self-check checklist at the end of that template, AND validate mechanically: `node <skill-dir>/tools/validate-workflow.js <project>/.claude/workflows/<name>.js` (via Bash). Fix every ERROR before treating the script as ready-to-run; if Bash is unavailable or denied, say so and rely on the manual self-check alone.
    - Place the artifacts in the project (see below).
    - **Do not run the script.** Offer to run it as a separate step (an explicit user opt-in; the run itself is done by the Workflow tool, not this skill).
+   - When the user comes back after a run - finished, interrupted, or disappointing - read `reference/after-run.md` (post-verify against the contract, resume vs re-plan, re-use with `args`).
    - **(Optional, on request) Diagram.** If the user asks for a visualization (or accepts a one-line offer), generate a self-contained HTML diagram of the workflow per `reference/diagram-html.md`, in **plain client-facing language** (the audience is a non-technical client and the tired author): everyday words, a one-line explanation under each block, a legend - no internal jargon on screen. It is a view of the plan - it must match the branch map. Workflow plans only; not produced unless asked.
 
 ## Atomicity
@@ -78,6 +79,8 @@ Every step (linear) or atom (workflow) is **one meaningful action with its own v
 | Writing a workflow plan | `templates/workflow-plan.md` |
 | Translating a plan into a script | `reference/plan-to-script.md` + `reference/workflow-primitives.md` + `templates/workflow-script.js` |
 | Writing a linear plan | `templates/linear-plan.md` |
+| Deep multi-agent check of a workflow prompt (opt-in, its own consent) | `reference/review-workflow.md` + `templates/review-prompt.js` |
+| The user returns after a run (results, failed branches, resume, re-use) | `reference/after-run.md` |
 | Drawing the workflow diagram (on request) | `reference/diagram-html.md` |
 | Need a worked example | `examples.md` |
 
@@ -101,6 +104,7 @@ Load on demand, not all at once.
 ## What it does not do
 
 - Does not run the workflow itself (only prepares the plan + script; running is an opt-in).
+- Does not run the review-workflow (the deep prompt check) silently - it needs its own explicit "yes", separate from the inline-check consent (`reference/review-workflow.md`).
 - Does not generate the script in the same turn as the plan - the plan must be approved first.
 - Does not create `.claude/agents` subagents (that is agent-constructor).
 - Does not write artifacts outside the current project.

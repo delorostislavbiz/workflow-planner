@@ -70,8 +70,16 @@ Primitive: sequential (input - the previous phase's results)
 - Run the contract's **independent check** here - a verify the generating agents did not make themselves (a separate skeptic agent for expensive/important goals).
 - Pass only if all predicates hold AND the independent check confirms them.
 
+## Scale & budget
+- **Agents total:** ~<N> (<branches> work + <verify agents> verify + <1> synthesis). If a branch loops: worst case <cap x rounds>.
+- **Waves:** concurrency is capped at min(16, cores-2) - call that cap C. ~<ceil(N/C)> wave(s) of parallel work (on an 8-core machine C=6, so 32 agents is ~6 waves, not 2). More agents than the cap just queue, they do not speed anything up.
+- **If the budget runs short:** what gets cut FIRST, explicitly - <e.g. "verify only blocker findings" / "process 20 of 30 pages and say so">. The script checks `budget.remaining()` before big batches and degrades by this rule, never silently.
+
+State the numbers so the user decides about the run knowing its size. A workflow is token-expensive by design; surprising the user with the bill afterwards is a planning failure.
+
 ## Running
 A workflow runs in the background and requires an explicit opt-in. After the plan is approved, the script `.claude/workflows/<kebab-name>.js` is generated. If branches write to the same files in parallel, `isolation:'worktree'` and a git repository are needed.
+After the run - reading the result, recovering failed branches (resume), re-plan vs re-run, and re-use with new `args` - see `reference/after-run.md`. If the task is repeatable (weekly audit, release acceptance), keep run-specific inputs in `args`, not hardcoded.
 
 ## Diagram (optional, on request)
 A self-contained HTML view of this workflow - phases, parallel branches, and loops with their stop conditions - can be generated on request as `PLAN.diagram.html` (see `reference/diagram-html.md`). Not produced unless asked.

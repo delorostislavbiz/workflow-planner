@@ -51,6 +51,32 @@ Otherwise **FAIL**, naming the missing claim or the violated forbidden action.
   explicit "yes"). See `F13`.
 - The **linear** fixture must end in STOP with no workflow prompt/script (`F2`).
 
+## Automated runs (experimental)
+
+`tools/run-fixtures.js` automates the copy-paste part for SINGLE-TURN fixtures: it pipes
+each fixture input to a headless run (`claude -p` by default, via stdin), gives every
+fixture a **fresh workspace directory under `--out`** (so anything the driven skill writes -
+PLAN.md, scripts - lands in the polygon, isolated per fixture, never in the repo), saves
+transcripts, and with `--judge` asks a second headless run to score the transcript against
+the fixture spec (strict JSON verdict).
+
+```
+node tools/run-fixtures.js --suite tests/prompt-helper/fixtures.md ^
+     --out D:\AI-PROJECTS\WORKFLOW-PLANNER-TEST\prompt-helper --judge
+```
+
+The skill must be installed globally (`~/.claude/skills` / `%USERPROFILE%\.claude\skills`)
+so it triggers inside the per-fixture workspaces.
+
+Limits (why the manual runbook still exists):
+- Fixtures marked **[multi-turn]** (consent flows, approval checkpoints, probe answers -
+  F5, F6, F7, F13 here) are skipped: a headless single shot cannot answer a question or
+  decline an offer. Drive those by hand.
+- The judge is a model: treat PASS/FAIL as triage. Spot-check every FAIL - and one random
+  PASS - by hand before acting on them.
+- The runner also serves the planner suite: `tests/gate/fixtures.md` (mostly multi-turn by
+  design - the planner flow has ratification and approval checkpoints).
+
 ## Where results live
 
 Save the filled transcripts + evidence under

@@ -15,7 +15,7 @@ plain and short. In novice mode, one question at a time.
 - **planner** — the existing flow of the skill: gate -> plan (no JS script in Codex).
 - **Codex workflow** — main-thread orchestration of flat subagents (the main agent spawns, steers, waits for, and integrates them; no JS script, no `parallel`/`pipeline` primitives).
 - **target-workflow** — the workflow the prompt is being written for. The helper never runs it.
-- **review-workflow** — a separate run where the main agent spawns reviewer subagents to check the prompt for holes (phase 2, not MVP).
+- **review-workflow** — a separate run where the main agent spawns reviewer subagents to check the prompt for holes (`reference/review-workflow.md`).
 - **subagent** — a flat leaf worker with no nested sub-agents. (Plain "subagent" after first use.)
 
 ## Routing (summary; full table in SKILL.md)
@@ -125,8 +125,8 @@ many; the recipe closes some; surface only what the task needs. Each item is a
 
 ## Run modes (what may execute, and when)
 
-- **inline-check** — one assistant (the main agent), no subagents. Only after a "yes". **This is the whole check in MVP.**
-- **review-workflow** — a separate run where the main agent spawns reviewer subagents. Only after a separate explicit "yes". **Phase 2, not MVP.**
+- **inline-check** — one assistant (the main agent), no subagents. Only after a "yes". **This is the default check.**
+- **review-workflow** — a separate run where the main agent spawns 6 flat reviewer subagents (one skeptic lens each) and consolidates their findings. Only after a **separate** explicit "yes" — consent to the inline-check does not carry over. Offer it only when the stakes justify the cost (large / write-heavy / high-stakes target). How to run it: `reference/review-workflow.md`.
 - **target-workflow** — the workflow the prompt is for. The helper **never** runs it.
 
 So: nothing silently; inline-check after asking; review-workflow only after a separate yes.
@@ -148,6 +148,10 @@ overlapping file writes.
 - after a fix, re-assemble only the affected parts.
 
 Findings are ranked: **blocker / important / minor**. The target-workflow is never run.
+
+For a large, write-heavy, or high-stakes prompt, after (or instead of) the inline check,
+offer the deep **review-workflow** — with its own explicit consent and an honest cost line
+(see `reference/review-workflow.md`). Its findings feed this same repair-loop.
 
 ## Steps 4 & 6 — Assemble and hand off
 

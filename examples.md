@@ -1,6 +1,6 @@
 # Examples
 
-Two contrasting runs: one task fits a workflow, the other does not. The gate's reasoning and the resulting artifact are shown.
+Four contrasting runs: a plain fit, a clear no-fit, a shared-source task that needs a phase-0 anchor, and an unknown-size discovery loop. The gate's reasoning and the resulting artifact are shown.
 
 ---
 
@@ -64,6 +64,113 @@ Mode: Linear (a hard chain of dependencies, nothing to parallelize)
 ```
 
 Here a workflow would only add background-run overhead with no gain - a linear plan is shorter and clearer.
+
+---
+
+## Example 3: shared source -> phase-0 anchor
+
+**User task:** "Write the README, API reference, install guide, and FAQ for tool X - all from one command list."
+
+**Gate reasoning:** Four same-type chunks - but they all cite one source of truth (the command/flag list) that is not fixed yet. Launched blind, each agent would invent its own version of the commands and the docs would diverge. 4 chunks is "3+" (the Shared-source threshold rule in `reference/applicability.md`) -> **Fits, as a workflow with a phase-0 anchor** - never blind parallel, and not linear either.
+
+**Plan (short):**
+
+- Phase 0 "Anchor" [sequential]: one agent fixes the command inventory. Output: the reference list.
+- Phase 1 "Docs" [parallel, 4 branches]: each doc written with the inventory passed INTO its prompt.
+- Phase 2 "Consistency" [depends on Phase 1]: one agent cross-checks the docs against the inventory.
+- Post-verify: every command mentioned in the docs exists in the inventory; no doc contradicts another.
+
+**Script (`.claude/workflows/docs-pack-anchored.js`):**
+
+```js
+export const meta = {
+  name: 'docs-pack-anchored',
+  description: 'Fix the command inventory, then write 4 docs in parallel from it',
+  phases: [{ title: 'Anchor' }, { title: 'Docs' }, { title: 'Consistency' }],
+}
+
+phase('Anchor')
+const inventory = await agent(
+  'Build the command inventory for tool X: every command, flag and default, from bin/x --help and docs/cli.md. Return a compact reference list.',
+  { label: 'anchor:inventory', phase: 'Anchor' }
+)
+if (!inventory) {
+  log('Anchor failed - stopping: writing the docs blind is exactly the divergence we are avoiding.')
+  return null
+}
+
+const docs = ['README', 'API reference', 'install guide', 'FAQ']
+phase('Docs')
+// positions are preserved: results[i] belongs to docs[i]; the four docs are NAMED
+// and all required, so no .filter(Boolean) - check them by name instead.
+const results = await parallel(docs.map((d) => () =>
+  agent(`Write the ${d} for tool X. Use ONLY this command inventory as the source of truth - do not invent commands or flags:\n${inventory}`,
+        { label: `doc:${d}`, phase: 'Docs' })))
+
+const missing = docs.filter((d, i) => !results[i])
+if (missing.length) log(`Failed: ${missing.join(', ')} - the pack is incomplete, re-run those`)
+
+phase('Consistency')
+const check = await agent(
+  `Cross-check these docs against the command inventory and against each other. Flag every command/flag mismatch.\n\nInventory:\n${inventory}\n\nDocs:\n${results.filter(Boolean).join('\n\n---\n\n')}`,
+  { label: 'consistency', phase: 'Consistency' }
+)
+return { docs: results, check }
+```
+
+The anchor is just a sequential phase before the parallel one - parallelism is preserved, divergence is not. Note the two failure styles: the anchor is guarded by name (all-or-stop), the docs degrade explicitly by name (never a silent `.filter`).
+
+---
+
+## Example 4: unknown-size discovery -> loop until dry
+
+**User task:** "Find the edge-case bugs in module X - keep digging until nothing new turns up."
+
+**Gate reasoning:** Independent finder runs from different angles - parallelism is real. But the size is unknown: no fixed list of units, so a single fan-out would miss the tail. -> **Fits, as an orchestrator-level loop** (recipe 8): rounds of finders, dedup between rounds, stop when dry. The loop needs an EXPLICIT stop - cap + no-progress break + budget guard.
+
+**Script (`.claude/workflows/edge-case-hunt.js`):**
+
+```js
+export const meta = {
+  name: 'edge-case-hunt',
+  description: 'Hunt edge-case bugs in module X until two dry rounds, then verify survivors',
+  phases: [{ title: 'Hunt' }, { title: 'Verify' }],
+}
+
+const ANGLES = ['boundary values', 'error handling', 'concurrency', 'malformed input']
+const BUGS = { type: 'object', properties: { bugs: { type: 'array', items: { type: 'string' } } }, required: ['bugs'] }
+const key = (b) => b.toLowerCase().replace(/\s+/g, ' ').slice(0, 80)
+
+const seen = new Set()
+const found = []
+let dry = 0
+
+phase('Hunt')
+for (let round = 1; round <= 5 && dry < 2; round++) {          // hard cap + no-progress break
+  if (budget.total && budget.remaining() < 50000) {             // budget guard
+    log(`Budget floor reached at round ${round} - stopping the hunt early (results are partial)`)
+    break
+  }
+  const batch = (await parallel(ANGLES.map((a) => () =>
+    agent(`Find edge-case bugs in module X (src/x/). Angle: ${a}. Already known - do NOT repeat:\n${found.join('\n') || '(none yet)'}`,
+          { label: `hunt:${a}:r${round}`, phase: 'Hunt', schema: BUGS })
+  ))).filter(Boolean).flatMap((r) => r.bugs)
+  const fresh = batch.filter((b) => !seen.has(key(b)))          // dedup vs everything SEEN
+  fresh.forEach((b) => { seen.add(key(b)); found.push(b) })
+  dry = fresh.length === 0 ? dry + 1 : 0
+  log(`round ${round}: +${fresh.length} new (${found.length} total, dry=${dry})`)
+}
+
+phase('Verify')
+const verified = await pipeline(
+  found,
+  (bug, _o, i) => agent(`Try to REFUTE this bug report for module X (src/x/): ${bug}\nAnswer "confirmed: <why>" or "refuted: <why>".`,
+                        { label: `verify:${i}`, phase: 'Verify' })
+)
+return { found, verified: verified.filter(Boolean) }
+```
+
+Three stops guard the loop (a `for` cap, `dry < 2`, the budget floor) - never an open `while (true)`. Dedup runs against everything *seen*, so a refuted finding cannot reappear and reset the dry counter. Verification is a `pipeline`, not a barrier: each bug's skeptic runs as soon as the bug exists.
 
 ---
 

@@ -49,6 +49,27 @@ available: **nested sub-agents** — agents are leaf-agents. The list of units p
 - **Slots:** the problem; the distinct angles; the judging criteria; output.
 - **Feasibility:** attempts and judges are flat `parallel`; the synthesis is a single agent. No nesting.
 
+## 6. Dimension review -> verify findings
+
+- **When it fits:** one artifact or scope reviewed across several independent dimensions, and the findings must survive a check before being reported. (audit a codebase for bugs/security/performance; QA a release; review a document set for facts/style/consistency)
+- **Form:** `parallel` over the dimensions -> dedup (plain code) -> a flat `parallel` of skeptics, one per finding, each told to REFUTE it -> one synthesis of the survivors.
+- **Slots:** the artifact/scope (paths, not "the project"); the dimensions; the kill bar (what refutes a finding); output format.
+- **Feasibility:** the barrier after the dimensions IS justified - dedup needs all findings at once. Verification is a flat `parallel` of leaf-agents. Dedup and ranking are plain code, not agents. If findings can be many, state a cap or a severity floor for the verify stage - or the verify fan-out dwarfs the review itself.
+
+## 7. Migration (discover -> transform -> verify)
+
+- **When it fits:** many same-type items must be moved or converted - files to a new API, tables to a new schema, pages to a new CMS - and each item is transformable on its own once the target rules are fixed.
+- **Form:** optional phase-0 anchor (one agent fixes the target rules/schema) -> `pipeline(items, transform, verify)` - each item flows on its own, its verify runs while others still transform.
+- **Slots:** the item list (or how to discover it - scout it inline before the workflow); the target rules; the per-item verify (a deterministic gate first: test / compile / schema check); write boundaries.
+- **Feasibility:** the item list must be known before the `pipeline` call. If the items cite one not-yet-fixed target (schema, API contract), that is the **Shared-source threshold rule** in `reference/applicability.md` - anchor first, never blind. If items write into shared files, the prompt must say so: `isolation:'worktree'` + git.
+
+## 8. Accumulate until dry (loop with a stop)
+
+- **When it fits:** discovery of unknown size - keep finding until nothing new comes up. (hunt bugs or edge cases, collect sources, enumerate affected call sites)
+- **Form:** an orchestrator-level loop: a round of finder agents (`parallel`) -> dedup against EVERYTHING seen so far (plain code) -> stop after K consecutive rounds with nothing new; then optional verify/synthesis of the accumulated set.
+- **Slots:** what counts as "the same finding" (the dedup key); K (dry rounds, usually 2); a hard iteration cap; the budget guard.
+- **Feasibility:** the loop lives in the script, not in an agent - fine at the orchestrator level. It MUST carry an explicit stop: iteration cap + no-progress break + budget guard, never an open `while(true)` (see "Loops with a stop condition" in `reference/plan-to-script.md`). Dedup against all *seen* findings, not only confirmed ones - otherwise rejected findings reappear every round and the loop never dries.
+
 ---
 
 ## Doesn't fit / more complex

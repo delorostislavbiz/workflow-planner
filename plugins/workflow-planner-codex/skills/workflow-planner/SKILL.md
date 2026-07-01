@@ -73,7 +73,9 @@ Every linear step or workflow atom is one meaningful action with its own verify.
 | Writing a Codex workflow plan | `templates/codex-workflow-plan.md` |
 | Mapping a plan to subagents | `reference/plan-to-codex-workflow.md` + `reference/codex-workflow-runtime.md` |
 | Writing a linear plan | `templates/linear-plan.md` |
-| Need a worked Prompt Helper example | `examples.md` |
+| Deep multi-agent check of a workflow prompt (opt-in, its own consent) | `reference/review-workflow.md` |
+| The user returns after a run (results, failed branches, re-run, re-use) | `reference/after-run.md` |
+| Need a worked example (Prompt Helper or planner) | `examples.md` |
 
 Load on demand, not all at once.
 
@@ -100,4 +102,5 @@ Load on demand, not all at once.
 - Does not rely on recursive subagents.
 - Does not split trivial linear work into agents.
 - Does not run subagents before explicit user approval.
+- Does not run the review-workflow (the deep prompt check) silently - it needs its own explicit "yes", separate from the inline-check consent (`reference/review-workflow.md`).
 - The Prompt Helper does not run the target workflow - it only builds the prompt.

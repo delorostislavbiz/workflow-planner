@@ -7,7 +7,7 @@ This repository keeps the original Claude Code skill intact and adds a separate 
 - **Claude Code users** install the root folder as the existing Claude skill.
 - **Codex users** install the Codex plugin from `plugins/workflow-planner-codex/`.
 
-They are separate runtime packages in one GitHub repository. A Codex user does not need to install the Claude skill, and a Claude user does not need the Codex plugin.
+They are separate runtime packages in one GitHub repository. A Codex user does not need to install the Claude skill, and a Claude user does not need the Codex plugin. File-level parity between the two copies is tracked in `PARITY.md` (advisory check: `node tools/check-parity.js`).
 
 ## What the Codex Version Does
 

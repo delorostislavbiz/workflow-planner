@@ -74,3 +74,5 @@ return c
 // 5. parallel (barrier, waits for ALL) vs pipeline (flow, the DEFAULT) is a deliberate choice.
 // 6. If the script loops (until-dry / until-budget / retry), it has an EXPLICIT stop:
 //    iteration cap + no-progress break + budget guard - never an open while(true).
+// 7. Mechanical check on top of this list: node <skill-dir>/tools/validate-workflow.js <this file>
+//    - fix every ERROR it reports (it catches fabrications and resume-breakers deterministically).

@@ -82,3 +82,33 @@ So: if a task needs a worker that itself splits into sub-workers, that is NOT a 
 - `isolation: "isolated"` / `isolation: "fresh"` - do not exist. Context isolation is the default anyway; for an "independent opinion" (judge panel, skeptic) no separate option is needed - just pass the data into the prompt as a string.
 - `EnterWorktree` / `ExitWorktree` inside the script - not allowed. These are session-scoped MCP tools, not primitives; they switch the CWD of the whole session. For parallel write isolation use `agent(..., {isolation:'worktree'})`, or have the subagent run `git worktree add` itself via Bash.
 - There is no sixth primitive. Only agent / parallel / pipeline / phase / log.
+
+## Empirical facts registry (re-verify on Claude Code updates)
+
+This file mixes two kinds of facts. **Documented** facts come from the official docs / the
+Workflow tool description - they change loudly, with release notes. **Empirical** facts were
+established by probe runs and are NOT in the docs - they rot silently when Claude Code
+updates. Every empirical fact lives here with its verification date.
+
+| Fact | Kind | Last verified | Re-check by |
+|------|------|---------------|-------------|
+| Workflow agents are leaves: no Agent tool, cannot spawn subagents (even `agentType: 'general-purpose'`) | empirical | 2026-06-24, 3 probe runs | probe 1 below |
+| `agentType` roles must be registered at session start; no hot-reload of a role file added mid-session | empirical | not recorded - date it at the next probe | probe 2 below |
+| Agent-tool nesting depth is 5, outside Workflow (v2.1.172); reported flakiness in GitHub issue #19077 | documented + issue | 2026-06 (docs) | docs / changelog |
+| Limits: min(16, cores-2) concurrent, 1000 agents per run, 4096 items per call | documented | - | docs |
+| `Date.now()` / `Math.random()` / argless `new Date()` unavailable | documented | - | docs |
+| Resume of a stopped run: completed agents return cached results, the rest run live | documented | - | docs |
+| `resumeFromRunId` relaunch parameter + longest-unchanged-prefix replay of `agent()` calls | tool description only (not in public docs) | 2026-07-01, read from the Workflow tool description | re-read the tool description; if absent, fall back to the documented same-script relaunch (`reference/after-run.md` §3) |
+
+**When to re-verify:** a Claude Code major/minor update mentioning workflows or subagents; any
+run behaving contrary to a fact above; or an empirical fact older than ~3 months. When a fact
+falls, update the section that relies on it ("Depth and nesting", "The 5 primitives") and the
+boundary note in SKILL.md - do not leave the registry and the prose disagreeing.
+
+**Probe procedure** (cheap, ~4 agents; run it in the dedicated test polygon - see CLAUDE.md - never in this repo):
+1. *Leaves:* a minimal workflow, one default agent, prompt: "List the tools available to you.
+   Attempt to call the Agent tool with a trivial subtask; report the exact error if it is
+   unavailable." Repeat with `agentType: 'general-purpose'`. Expected today: no Agent tool.
+2. *Hot-reload:* add a new role file to `.claude/agents` mid-session, then run a one-agent
+   workflow with that `agentType`. Expected today: "agent type ... not found".
+3. Record: date, Claude Code version, verbatim outcome - then update the table above.
