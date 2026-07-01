@@ -28,7 +28,7 @@ and flags drift (it cannot judge meaning - it catches forgotten mirrors, not bad
 | `templates/workflow-script.js` | — | Claude-only (Codex has no JS runtime) |
 | `templates/review-prompt.js` | — | Claude-only (the Codex reviewer brief lives inside its `reference/review-workflow.md`) |
 | `examples.md` | `examples.md` | shared idea; artifacts differ per runtime (scripts vs plan shapes) |
-| `tests/prompt-helper/*` | `tests/prompt-helper/*` | shared |
+| `tests/prompt-helper/*` | `tests/prompt-helper/*` | shared; fixture DATA (sources, counts) must match. Accepted runtime difference: Claude inputs start with an explicit `/workflow-planner` call (other installed skills hijack description-matching; headless may not auto-activate) - Codex inputs stay bare, its runbook drives activation itself |
 | `tests/gate/*` | `tests/gate/*` | shared logic; script/validator claims reworded per runtime (G9 tests the Run Protocol instead) |
 | `tools/validate-workflow.js` | — | Claude-only (validates the JS runtime) |
 | `tools/run-fixtures.js` | usable for Codex via `--cmd "codex exec"` | shared tool |

@@ -15,7 +15,7 @@ runners must skip these - run them manually per the runbook.
 ---
 
 ### F1 — Fan-out (fit)
-- **Input:** "I have about 30 product pages, check each for SEO and give me a summary."
+- **Input:** "I have 30 product pages: https://shop.example.com/products/p001.html ... p030.html (numbered p001..p030). Check each for SEO and give me a summary."
 - **Route:** build-path, gate=fit.
 - **Key claims:** gate verdict = fit with reason (30 same-type units); proposes the Fan-out recipe; per-unit verify is by content (not "30 checked"); a wait-for-all barrier before the summary; autonomy = read-only -> autonomous.
 - **Forbidden:** running any workflow; recommending a linear plan.
@@ -29,14 +29,14 @@ runners must skip these - run them manually per the runbook.
 - **Pass/fail:** PASS if it ends in a linear recommendation + STOP.
 
 ### F3 — Shared source, 3+ chunks
-- **Input:** "Write the README, API reference, install guide, and FAQ for tool X — all from one command list."
+- **Input:** "Write the README, API reference, install guide, and FAQ for tool X — all from one command list: the output of `toolx --help`."
 - **Route:** build-path, gate=fit.
 - **Key claims:** detects a shared source; 4 chunks = "3+"; proposes a phase-0 anchor; the fixed source is passed into each chunk prompt.
 - **Forbidden:** blind fan-out without an anchor; routing 3+ to linear.
 - **Pass/fail:** PASS if the prompt has a phase-0 anchor feeding the parallel chunks.
 
 ### F4 — Shared source, 2 chunks
-- **Input:** "Write the README and the API reference from one command list."
+- **Input:** "Write the README and the API reference from one command list: the output of `toolx --help`."
 - **Route:** build-path, gate.
 - **Key claims:** 2 chunks -> linear (fix the source, then write both); references the Shared-source threshold rule.
 - **Forbidden:** a phase-0 anchor workflow for only 2 chunks.
@@ -64,7 +64,7 @@ runners must skip these - run them manually per the runbook.
 - **Pass/fail:** PASS if assumptions are stated and the exit condition is respected.
 
 ### F8 — Language preservation (English/mixed)
-- **Input:** "I want a workflow that reviews 15 PRs and writes one digest." (English)
+- **Input:** "I want a workflow that reviews the 15 open PRs (#101-#115) in our GitHub repo acme/webshop and writes one digest." (English)
 - **Route:** build-path, gate=fit.
 - **Key claims:** the helper responds in English; the final prompt is in English.
 - **Forbidden:** switching to Russian.

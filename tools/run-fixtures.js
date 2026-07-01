@@ -139,7 +139,8 @@ const fixtures = parseFixtures(args.suite);
 const selected = fixtures.filter((f) => !args.only || args.only.includes(f.id));
 if (selected.length === 0) { console.error('No fixtures matched.'); process.exit(1); }
 
-const stamp = new Date().toISOString().slice(0, 10);
+const now = new Date(); // local date, not UTC: transcripts must carry the operator's calendar day
+const stamp = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-');
 const outDir = path.join(args.out, stamp);
 fs.mkdirSync(outDir, { recursive: true });
 const commit = gitCommit(path.dirname(args.suite));
