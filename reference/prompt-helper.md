@@ -15,7 +15,7 @@ plain and short. In novice mode, one question at a time.
 - **planner** — the existing flow of the skill: gate -> plan -> JS script.
 - **Workflow tool / Dynamic Workflow** — the runtime that runs the JS script with agents (`parallel`/`pipeline`).
 - **target-workflow** — the workflow the prompt is being written for. The helper never runs it.
-- **review-workflow** — a separate multi-agent run that reviews the prompt for holes (phase 2, not MVP).
+- **review-workflow** — a separate multi-agent run that reviews the prompt for holes (`reference/review-workflow.md`).
 - **leaf-agent** — an agent inside a workflow with no nested sub-agents. (Plain "leaf-agent" after first use.)
 
 ## Routing (summary; full table in SKILL.md)
@@ -125,8 +125,8 @@ many; the recipe closes some; surface only what the task needs. Each item is a
 
 ## Run modes (what may execute, and when)
 
-- **inline-check** — one assistant, no agents. Only after a "yes". **This is the whole check in MVP.**
-- **review-workflow** — a separate multi-agent review run. Only after a separate explicit "yes". **Phase 2, not MVP.**
+- **inline-check** — one assistant, no agents. Only after a "yes". **This is the default check.**
+- **review-workflow** — a separate multi-agent review run (6 skeptic lenses + synthesis). Only after a **separate** explicit "yes" — consent to the inline-check does not carry over. Offer it only when the stakes justify the cost (large / write-heavy / high-stakes target). How to deliver it and the ready script: `reference/review-workflow.md` + `templates/review-prompt.js`.
 - **target-workflow** — the workflow the prompt is for. The helper **never** runs it.
 
 So: nothing silently; inline-check after asking; review-workflow only after a separate yes.
@@ -148,6 +148,10 @@ overlapping file writes.
 - after a fix, re-assemble only the affected parts.
 
 Findings are ranked: **blocker / important / minor**. The target-workflow is never run.
+
+For a large, write-heavy, or high-stakes prompt, after (or instead of) the inline check,
+offer the deep **review-workflow** — with its own explicit consent and an honest cost line
+(see `reference/review-workflow.md`). Its findings feed this same repair-loop.
 
 ## Steps 4 & 6 — Assemble and hand off
 

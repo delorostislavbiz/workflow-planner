@@ -50,6 +50,27 @@ subagents are flat leaf workers by default. The list of units to fan out over mu
 - **Slots:** the problem; the distinct angles; the judging criteria; output.
 - **Feasibility:** attempts and judges are flat subagents; the synthesis is a single agent. No nesting.
 
+## 6. Dimension review -> verify findings
+
+- **When it fits:** one artifact or scope reviewed across several independent dimensions, and the findings must survive a check before being reported. (audit a codebase for bugs/security/performance; QA a release; review a document set for facts/style/consistency)
+- **Form:** flat review subagents, one per dimension, at once -> the main agent dedups the findings (plain work, not a subagent) -> flat skeptic subagents, one per finding, each told to REFUTE it -> the main agent (or one subagent) synthesizes the survivors.
+- **Slots:** the artifact/scope (paths, not "the project"); the dimensions; the kill bar (what refutes a finding); output format.
+- **Feasibility:** waiting for all dimensions before dedup IS justified - dedup needs all findings at once. Verification is a flat set of leaf subagents. Dedup and ranking are main-agent work. If findings can be many, state a cap or a severity floor for the verify stage - or the verify fan-out dwarfs the review itself (Codex prefers 2-6 subagents; batch accordingly).
+
+## 7. Migration (discover -> transform -> verify)
+
+- **When it fits:** many same-type items must be moved or converted - files to a new API, tables to a new schema, pages to a new CMS - and each item is transformable on its own once the target rules are fixed.
+- **Form:** optional phase-0 anchor (one subagent or the main agent fixes the target rules/schema) -> per item: transform then verify, the main agent moving each item onward as soon as its previous stage finishes - no global barrier.
+- **Slots:** the item list (or how to discover it - the main agent scouts it first); the target rules; the per-item verify (a deterministic gate first: test / compile / schema check); write boundaries.
+- **Feasibility:** the item list must be known before the fan-out. If the items cite one not-yet-fixed target (schema, API contract), that is the **Shared-source threshold rule** in `reference/applicability.md` - anchor first, never blind. If items write into shared files, split ownership by disjoint file sets - never let two subagents own the same file family.
+
+## 8. Accumulate until dry (loop with a stop)
+
+- **When it fits:** discovery of unknown size - keep finding until nothing new comes up. (hunt bugs or edge cases, collect sources, enumerate affected call sites)
+- **Form:** a main-agent loop: a round of flat finder subagents -> the main agent dedups against EVERYTHING seen so far -> stop after K consecutive rounds with nothing new; then optional verify/synthesis of the accumulated set.
+- **Slots:** what counts as "the same finding" (the dedup key); K (dry rounds, usually 2); a hard iteration cap; the cost limit the user accepts.
+- **Feasibility:** the loop is main-agent work - fine at the orchestrator level. It MUST carry an explicit stop: iteration cap + no-progress break + an agreed cost ceiling, never an open "keep going until done". Dedup against all *seen* findings, not only confirmed ones - otherwise rejected findings reappear every round and the loop never dries.
+
 ---
 
 ## Doesn't fit / more complex

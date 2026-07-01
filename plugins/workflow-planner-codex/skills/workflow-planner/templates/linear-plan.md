@@ -11,6 +11,8 @@ Gate verdict: not a fit for subagents - <why: linear chain / shared mutable stat
 - <what is taken as given about the task - environment, inputs, scope>
 - <assumption 2>
 
+State assumptions before the steps (in the language of the task). If any is wrong, the plan changes - confirm the doubtful ones with the user first.
+
 ## Acceptance Contract
 - **Goal (one measurable line):** <what + threshold>
 - **Done when (observable predicates):**
@@ -39,3 +41,10 @@ Each step is one meaningful action. Verify must be concrete enough to prove the 
 - Granularity: no step hides 3+ sub-actions or more than roughly half a day of work.
 - Verify strength: no verify is only "check manually" or only a count when content can be sampled.
 - Simplicity: no subagents are used where a linear plan is clearer.
+- Plan quality score >= 8/10, otherwise refine.
+
+## TODO in Code (Source of Truth for What Is Unfinished)
+
+- In each file to change, add: `// TODO(step-N): <what to do>` referencing the step number.
+- Did the step -> ran verify -> removed the TODO from the file.
+- Code = the source of truth for what is still not done.

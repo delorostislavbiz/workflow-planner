@@ -8,6 +8,10 @@ Covers: fit (fan-out), linear no-workflow, shared-source at both thresholds (3+ 
 draft-audit, free interview, fuzzy input, language preservation, edge cases (§17), and a
 no-consent negative.
 
+**[multi-turn]** in a fixture header means its key claims need a human driving several
+turns (pasting a draft, answering probes, declining an offer); automated single-shot
+runners must skip these - run them manually per the runbook.
+
 ---
 
 ### F1 — Fan-out (fit)
@@ -38,21 +42,21 @@ no-consent negative.
 - **Forbidden:** a phase-0 anchor workflow for only 2 chunks.
 - **Pass/fail:** PASS if it recommends linear/sequential, not a workflow.
 
-### F5 — Draft-audit with holes
+### F5 — Draft-audit with holes [multi-turn]
 - **Input:** a pasted near-ready prompt: "Build the site fully autonomously, one agent per page." (no verify, no per-agent data)
 - **Route:** draft-audit.
 - **Key claims:** findings include over-promised autonomy (item 8), verify-by-count (item 7), subagent missing data (item 6); gives patch recommendations (keep/fix/add/remove); no full rebuild.
 - **Forbidden:** rebuilding the prompt from scratch unasked; running a review-workflow without consent.
 - **Pass/fail:** PASS if it returns patches without a rebuild.
 
-### F6 — Novel task -> free interview
+### F6 — Novel task -> free interview [multi-turn]
 - **Input:** "Turn our messy support inbox into something useful — not sure how."
 - **Route:** build-path, gate=unclear -> interview.
 - **Key claims:** probes; no recipe matches cleanly; falls back to the free interview; states assumptions.
 - **Forbidden:** forcing a recipe that doesn't fit.
 - **Pass/fail:** PASS if it runs the interview and fills the checklist.
 
-### F7 — Fuzzy / dictated input
+### F7 — Fuzzy / dictated input [multi-turn]
 - **Input:** garbled voice text, e.g. "ну тип надо штобы агенты разобрали кучу файлов и че т выдали".
 - **Route:** build-path.
 - **Key claims:** interprets by meaning; states assumptions; after two probes asks "assemble on these assumptions or clarify more?"; does NOT output a final prompt if goal/result/units are still missing.
@@ -94,7 +98,7 @@ no-consent negative.
 - **Forbidden:** promising nested subagents inside the workflow.
 - **Pass/fail:** PASS if it gives the honest no-nesting answer + an alternative.
 
-### F13 — No-consent negative
+### F13 — No-consent negative [multi-turn]
 - **Input:** a clear fit task, but the user declines the hole-check and never asks for a deep run.
 - **Route:** build-path, gate=fit.
 - **Key claims:** the helper does not run the inline-check without a "yes"; never runs a review-workflow or the target-workflow.

@@ -33,7 +33,15 @@ The work must be decomposable into clean subagent prompts. Each branch needs eno
 
 Mentally remove parallelism. If the plan loses nothing, keep it linear. If independent chunks or a high-volume flow remain, use a flat Codex subagent workflow.
 
-## Shared Source of Truth
+## Decision Matrix (Signals)
+
+A quick complement to the two sections above (it does not replace them). A subagent workflow is not only about parallelism: a need for independent expertise or verification can justify one too. And many chunks do NOT justify one if they all write into a single mutable target.
+
+- **Fit:** independent units; a need for independent expertise or adversarial review; verifiable artifacts; a shared synthesis over the results; a high cost of a silent error.
+- **No-fit:** 1-2 steps; a shared mutable file family without ownership split; the goal is unclear; no verifiable result; cheaper to do linearly.
+- **Caution (may still fit, but flag it in the plan):** needs access/secrets; destructive changes; a high-stakes domain (legal / medical / financial); the task list is dynamic; strong step-by-step dependence on a human.
+
+## Shared Source of Truth (the Shared-source threshold rule)
 
 When several artifacts cite one source of truth, do not launch blind parallel branches until that source is fixed.
 
