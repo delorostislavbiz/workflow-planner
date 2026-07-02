@@ -32,7 +32,7 @@ What "done" means, fixed before the steps and frozen at plan approval. For trivi
 3. <step> -> verify: <...>
 N (final). Verify the whole task against the Acceptance Contract above -> verify: every "Done when" predicate checked and the independent check performed.
 
-Each step is one meaningful action. Verify must be concrete enough to prove the step is done. The final step closes by checking the Acceptance Contract, not an ad-hoc "looks done".
+Each step is one meaningful action. Verify must be concrete enough to prove the step is done. The final step closes by checking the Acceptance Contract, not an ad-hoc "looks done". **Trivial tasks stay at 1-3 steps:** no separate file-check or inventory steps, and the contract check folds into the last step's verify instead of being its own step.
 
 ## Plan Self-Review
 
@@ -41,6 +41,7 @@ Each step is one meaningful action. Verify must be concrete enough to prove the 
 - Granularity: no step hides 3+ sub-actions or more than roughly half a day of work.
 - Verify strength: no verify is only "check manually" or only a count when content can be sampled.
 - Simplicity: no subagents are used where a linear plan is clearer.
+- Trivial bound: if the task is one small edit, is the plan 1-3 steps with checks folded into the verifies (no ritual steps)?
 - Plan quality score >= 8/10, otherwise refine.
 
 ## TODO in Code (Source of Truth for What Is Unfinished)
