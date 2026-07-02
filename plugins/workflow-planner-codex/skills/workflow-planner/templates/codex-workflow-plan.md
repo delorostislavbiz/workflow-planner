@@ -112,6 +112,8 @@ Stop when: <stop condition>
 
 State the numbers so the user decides about the run knowing its size. Surprising the user with the cost afterwards is a planning failure.
 
+Before showing the plan, run the mechanical linter: `node <skill-dir>/tools/lint-plan.js <this plan>` - fix every ERROR (missing contract/predicates, steps without verify, blind dependent branches, missing Scale & Budget); review the warnings instead of ignoring them.
+
 ## Run Checkpoint
 
 This plan does not run anything by itself. After the user explicitly approves running it, the main Codex agent spawns the listed flat subagents, waits for required results, verifies artifacts, and synthesizes the final output.

@@ -5,6 +5,11 @@ All notable changes to the workflow-planner skill. Format loosely follows
 
 ## [Unreleased]
 
+- **Codex plugin 0.3.0:** ships its own byte-identical copy of `tools/lint-plan.js` and
+  wires it into both plan paths and both templates' self-review (same no-node fallback as
+  the Claude side). `check-parity.js` gained an 'identical' mode that flags stale tool
+  copies. The 2026-07-02 Pending item is closed.
+
 - **Plan linter** (`tools/lint-plan.js`): deterministic checks over generated plans —
   contract + predicates present, every step carries a verify, count-only / manual-only
   verifies flagged, ritual steps around trivial edits flagged, blind dependent branches

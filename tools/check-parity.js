@@ -14,8 +14,10 @@ const path = require('path');
 const ROOT = path.resolve(__dirname, '..');
 const CODEX = path.join(ROOT, 'plugins', 'workflow-planner-codex', 'skills', 'workflow-planner');
 
-// [claudePath, codexPath, compareHeadings]
-// compareHeadings=false: counterpart must exist, but its structure is intentionally different.
+// [claudePath, codexPath, mode]
+// mode=true: compare section headings; mode=false: counterpart must exist, but its
+// structure is intentionally different; mode='identical': byte-equal copies (shared tools
+// shipped inside the plugin - any diff means one side is stale).
 const PAIRS = [
   ['SKILL.md', 'SKILL.md', false],
   // applicability: heading phrasing differs by design ("...workflow" vs "...Codex subagent
@@ -34,6 +36,7 @@ const PAIRS = [
   ['tests/prompt-helper/fixtures.md', 'tests/prompt-helper/fixtures.md', true],
   ['tests/prompt-helper/runbook.md', 'tests/prompt-helper/runbook.md', false],
   ['tests/gate/fixtures.md', 'tests/gate/fixtures.md', false],
+  ['tools/lint-plan.js', 'tools/lint-plan.js', 'identical'],
 ];
 
 // Case and punctuation are normalized: "## Plan Self-Review" == "## Plan self-review".
@@ -52,6 +55,12 @@ for (const [a, b, compare] of PAIRS) {
   const name = `${a} <-> codex:${b}`;
   if (!fs.existsSync(fa)) { console.log(`MISSING (claude side!): ${a}`); missing++; continue; }
   if (!fs.existsSync(fb)) { console.log(`MISSING counterpart: ${name}`); missing++; continue; }
+  if (compare === 'identical') {
+    const norm = (p) => fs.readFileSync(p, 'utf8').replace(/\r\n/g, '\n');
+    if (norm(fa) === norm(fb)) { console.log(`ok (identical): ${name}`); }
+    else { drifted++; console.log(`DRIFT (copies differ): ${name} - re-copy the tool to whichever side is stale`); }
+    continue;
+  }
   if (!compare) { console.log(`ok (existence only): ${name}`); continue; }
 
   const ha = headings(fa);

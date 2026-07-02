@@ -42,6 +42,7 @@ Each step is one meaningful action. Verify must be concrete enough to prove the 
 - Verify strength: no verify is only "check manually" or only a count when content can be sampled.
 - Simplicity: no subagents are used where a linear plan is clearer.
 - Trivial bound: if the task is one small edit, is the plan 1-3 steps with checks folded into the verifies (no ritual steps)?
+- Mechanical pass: `node <skill-dir>/tools/lint-plan.js <this plan>` reports 0 errors (warnings reviewed, not ignored).
 - Plan quality score >= 8/10, otherwise refine.
 
 ## TODO in Code (Source of Truth for What Is Unfinished)
