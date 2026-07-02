@@ -77,6 +77,8 @@ Primitive: sequential (input - the previous phase's results)
 
 State the numbers so the user decides about the run knowing its size. A workflow is token-expensive by design; surprising the user with the bill afterwards is a planning failure.
 
+Before showing the plan, run the mechanical linter: `node <skill-dir>/tools/lint-plan.js <this plan>` - fix every ERROR (missing contract/predicates, steps without verify, blind dependent branches, missing Scale & budget); review the warnings instead of ignoring them.
+
 ## Running
 A workflow runs in the background and requires an explicit opt-in. After the plan is approved, the script `.claude/workflows/<kebab-name>.js` is generated. If branches write to the same files in parallel, `isolation:'worktree'` and a git repository are needed.
 After the run - reading the result, recovering failed branches (resume), re-plan vs re-run, and re-use with new `args` - see `reference/after-run.md`. If the task is repeatable (weekly audit, release acceptance), keep run-specific inputs in `args`, not hardcoded.

@@ -31,6 +31,7 @@ and flags drift (it cannot judge meaning - it catches forgotten mirrors, not bad
 | `tests/prompt-helper/*` | `tests/prompt-helper/*` | shared; fixture DATA (sources, counts) must match. Accepted runtime difference: Claude inputs start with an explicit `/workflow-planner` call (other installed skills hijack description-matching; headless may not auto-activate) - Codex inputs stay bare, its runbook drives activation itself |
 | `tests/gate/*` | `tests/gate/*` | shared logic; script/validator claims reworded per runtime (G9 tests the Run Protocol instead) |
 | `tools/validate-workflow.js` | — | Claude-only (validates the JS runtime) |
+| `tools/lint-plan.js` | — (see Pending) | runtime-neutral plan linter; Codex integration deferred - the plugin ships without `tools/` |
 | `tools/run-fixtures.js` | usable for Codex via `--cmd "codex exec"` | shared tool |
 | `tools/check-parity.js` | n/a | the checker itself |
 
@@ -46,7 +47,14 @@ and flags drift (it cannot judge meaning - it catches forgotten mirrors, not bad
 
 ## Pending (consciously deferred)
 
-(Empty. The 2026-07-01 batch - review-workflow, after-run, planner examples, gate fixtures,
+- **2026-07-02, `tools/lint-plan.js` -> Codex copy.** The linter is runtime-neutral (lints
+  PLAN.md text), but the Codex plugin is packaged without `tools/` and its SKILL.md never
+  references node tooling (its G9-analog tests the Run Protocol instead of a validator).
+  Deferred until the packaging question is decided (ship tools/ with the plugin vs point at
+  the repo checkout vs keep the Codex self-review purely manual). Until then the Codex
+  linear-plan self-review remains the only plan check on that side.
+
+(The 2026-07-01 batch - review-workflow, after-run, planner examples, gate fixtures,
 Scale & Budget, runbook automation section - was ported the same day. When you defer a new
 mirror, add it here with a date.)
 

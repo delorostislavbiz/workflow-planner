@@ -3,6 +3,17 @@
 All notable changes to the workflow-planner skill. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); dates are YYYY-MM-DD.
 
+## [Unreleased]
+
+- **Plan linter** (`tools/lint-plan.js`): deterministic checks over generated plans —
+  contract + predicates present, every step carries a verify, count-only / manual-only
+  verifies flagged, ritual steps around trivial edits flagged, blind dependent branches
+  (empty Input) flagged, Scale & budget required for workflow plans. Wired into both plan
+  templates' self-review and SKILL.md steps 3a/3b (with an honest no-Bash fallback).
+  Proven on the live plans from the 2026-07-02 runs: 3 clean PASS, 1 WARN that matches the
+  known G5 residual, and a seeded bad plan failing with 4 errors. Codex integration —
+  consciously deferred (see PARITY.md Pending: the plugin ships without `tools/`).
+
 ## [1.0.0] — 2026-07-02 (pending tag)
 
 First release considered **proven by live runs**: 23 fixtures (12 headless single-turn
