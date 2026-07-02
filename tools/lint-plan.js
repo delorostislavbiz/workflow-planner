@@ -33,7 +33,7 @@ const RX = {
   workflowMode: /mode:\s*\*{0,2}\s*dynamic workflow/i,
   branchMapHead: /^#{2,3}\s.*(branch map|карта веток|карта ветвей)/i,
   scaleHead: /^#{2,3}\s.*(scale\s*&\s*budget|scale and budget|масштаб и бюджет|бюджет)/i,
-  budgetCut: /(runs? short|не хватит|нехватк|сокращ|урезан|degrade|cut first|режется перв)/i,
+  budgetCut: /(runs? short|не хват|нехватк|сокращ|урез|degrade|cut first|реж[ею]м|режется|кончает|кончит)/i,
   assumptionsHead: /^#{2,3}\s.*(assumptions|допущени|annahmen)/i,
   tableRow: /^\s*\|(.+)\|\s*$/,
   tableRule: /^\s*\|[\s:|-]+\|\s*$/,
